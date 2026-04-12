@@ -6,21 +6,22 @@ FROM php:8.2-fpm-alpine
 # ---------- system dependencies ----------
 RUN apk add --no-cache \
     nginx \
-    postgresql-dev \
+    libpq-dev \
     libzip-dev \
     oniguruma-dev \
     icu-dev \
+    icu-libs \
     git \
     curl \
     zip \
     unzip \
-    gettext
+    gettext \
+    dos2unix
 
 # ---------- PHP extensions ----------
 RUN docker-php-ext-install \
     pdo \
     pdo_pgsql \
-    pdo_mysql \
     zip \
     mbstring \
     opcache \
@@ -38,7 +39,7 @@ RUN { \
     } > /usr/local/etc/php/conf.d/opcache.ini
 
 # ---------- Composer ----------
-COPY --from=composer:2.7 /usr/bin/composer /usr/bin/composer
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www/html
 
@@ -73,7 +74,8 @@ RUN rm -f /etc/nginx/http.d/default.conf
 
 # ---------- startup script ----------
 COPY docker/start.sh /start.sh
-RUN chmod +x /start.sh
+# Ensure LF line endings (safe on any OS)
+RUN dos2unix /start.sh && chmod +x /start.sh
 
 EXPOSE 8000
 

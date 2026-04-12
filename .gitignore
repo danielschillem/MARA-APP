@@ -27,3 +27,6 @@ mara-backend/database/database.sqlite
 # Frontend
 mara-frontend/node_modules/
 mara-frontend/dist/
+
+# Local Netlify folder
+.netlify

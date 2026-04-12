@@ -1,0 +1,91 @@
+# ============================================================
+#  render.yaml – Infrastructure-as-Code for Render
+#  Docs: https://render.com/docs/blueprint-spec
+#
+#  After first deploy, update APP_URL with the actual
+#  Render service URL (e.g. https://mara-api.onrender.com)
+#  and FRONTEND_URL with your Netlify URL.
+# ============================================================
+
+services:
+  - type: web
+    name: mara-api
+    env: docker
+    dockerfilePath: ./mara-backend/Dockerfile
+    dockerContext: ./mara-backend
+    plan: free
+    healthCheckPath: /up
+
+    envVars:
+      # ── App ──────────────────────────────────────────────
+      - key: APP_NAME
+        value: MARA
+      - key: APP_ENV
+        value: production
+      - key: APP_KEY
+        generateValue: true          # Render generates a unique key on first deploy
+      - key: APP_DEBUG
+        value: "false"
+      - key: APP_URL
+        value: https://mara-api.onrender.com   # ← update after first deploy
+      - key: APP_LOCALE
+        value: fr
+      - key: APP_FALLBACK_LOCALE
+        value: en
+
+      # ── CORS ─────────────────────────────────────────────
+      - key: FRONTEND_URL
+        value: https://mara-app.netlify.app     # ← update with your Netlify URL
+
+      # ── Database (PostgreSQL – linked from databases block)
+      - key: DB_CONNECTION
+        value: pgsql
+      - key: DB_HOST
+        fromDatabase:
+          name: mara-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: mara-db
+          property: port
+      - key: DB_DATABASE
+        fromDatabase:
+          name: mara-db
+          property: database
+      - key: DB_USERNAME
+        fromDatabase:
+          name: mara-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: mara-db
+          property: password
+
+      # ── Session / Cache / Queue ───────────────────────────
+      - key: SESSION_DRIVER
+        value: cookie
+      - key: SESSION_LIFETIME
+        value: "120"
+      - key: CACHE_STORE
+        value: file
+      - key: QUEUE_CONNECTION
+        value: sync
+
+      # ── Logging ──────────────────────────────────────────
+      - key: LOG_CHANNEL
+        value: stderr
+      - key: LOG_LEVEL
+        value: error
+
+      # ── Misc ─────────────────────────────────────────────
+      - key: FILESYSTEM_DISK
+        value: local
+      - key: BCRYPT_ROUNDS
+        value: "12"
+
+# ── Managed PostgreSQL database ──────────────────────────────
+databases:
+  - name: mara-db
+    plan: free
+    databaseName: mara_production
+    user: mara

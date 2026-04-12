@@ -1,0 +1,29 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Environment
+*.env
+*.env.backup
+*.env.production
+
+# Backend
+mara-backend/vendor/
+mara-backend/node_modules/
+mara-backend/.env
+mara-backend/storage/*.key
+mara-backend/public/hot
+mara-backend/public/storage
+mara-backend/public/build
+mara-backend/.phpunit.cache
+mara-backend/database/database.sqlite
+
+# Frontend
+mara-frontend/node_modules/
+mara-frontend/dist/

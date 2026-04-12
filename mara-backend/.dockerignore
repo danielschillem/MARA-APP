@@ -1,0 +1,17 @@
+.git
+.github
+vendor
+node_modules
+.env
+.env.*
+!.env.example
+storage/logs/*
+tests/
+.phpunit.cache
+public/hot
+public/storage
+public/build
+*.md
+Makefile
+docker-compose*.yml
+.dockerignore

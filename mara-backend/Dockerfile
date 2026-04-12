@@ -16,7 +16,8 @@ RUN apk add --no-cache \
     zip \
     unzip \
     gettext \
-    dos2unix
+    dos2unix \
+    netcat-openbsd
 
 # ---------- PHP extensions ----------
 RUN docker-php-ext-install \

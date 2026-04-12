@@ -1,7 +1,7 @@
 # ──────────────────────────────────────────
-#  MARA – Laravel API  |  PHP 8.2 + nginx
+#  MARA – Laravel API  |  PHP 8.4 + nginx
 # ──────────────────────────────────────────
-FROM php:8.2-fpm-alpine
+FROM php:8.4-fpm-alpine
 
 # ---------- system dependencies ----------
 RUN apk add --no-cache \

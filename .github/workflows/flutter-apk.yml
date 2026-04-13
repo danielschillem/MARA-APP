@@ -1,0 +1,53 @@
+name: Flutter APK Release
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "mara-flutter/**"
+      - ".github/workflows/flutter-apk.yml"
+
+jobs:
+  build:
+    name: Build & Upload APK
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: mara-flutter
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.27.0"
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Decode keystore
+        run: |
+          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > android/upload-keystore.jks
+
+      - name: Write key.properties
+        run: |
+          cat <<EOF > android/key.properties
+          storePassword=${{ secrets.ANDROID_STORE_PASSWORD }}
+          keyPassword=${{ secrets.ANDROID_KEY_PASSWORD }}
+          keyAlias=${{ secrets.ANDROID_KEY_ALIAS }}
+          storeFile=../upload-keystore.jks
+          EOF
+
+      - name: Build release APK
+        run: flutter build apk --release --split-per-abi
+
+      - name: Upload APK artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: mara-release-apk
+          path: mara-flutter/build/app/outputs/flutter-apk/app-*-release.apk
+          retention-days: 30

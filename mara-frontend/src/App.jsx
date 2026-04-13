@@ -17,6 +17,9 @@ import RegisterPage from './pages/RegisterPage';
 import ProfilePage from './pages/ProfilePage';
 import ObservatoryPage from './pages/ObservatoryPage';
 import NotFoundPage from './pages/NotFoundPage';
+import AlertsPage from './pages/AlertsPage';
+import TeamPage from './pages/TeamPage';
+import AdminPage from './pages/AdminPage';
 
 export default function App() {
   return (
@@ -40,7 +43,10 @@ export default function App() {
               <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
               <Route path="/conversations" element={<ProtectedRoute><CounselorChatPage /></ProtectedRoute>} />
               <Route path="/signalements" element={<ProtectedRoute><ReportManagementPage /></ProtectedRoute>} />
+              <Route path="/alertes" element={<ProtectedRoute><AlertsPage /></ProtectedRoute>} />
+              <Route path="/equipe" element={<ProtectedRoute><TeamPage /></ProtectedRoute>} />
               <Route path="/profil" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+              <Route path="/admin" element={<ProtectedRoute><AdminPage /></ProtectedRoute>} />
 
               {/* 404 */}
               <Route path="*" element={<NotFoundPage />} />

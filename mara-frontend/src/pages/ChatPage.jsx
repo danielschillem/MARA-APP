@@ -1,11 +1,12 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import api from '../api';
 import { Send, MessageCircle, EyeOff, Lock, UserCheck, X, Mic, Square, Play, Pause, Trash2 } from 'lucide-react';
 import MaraLogo from '../components/MaraLogo';
 import IconBadge from '../components/IconBadge';
+import { buildWsUrl } from '../utils/ws';
 
-const POLL_INTERVAL = 3000;
+const getWsUrl = (room) => buildWsUrl(room);
 
 export default function ChatPage() {
   const { t } = useTranslation();
@@ -17,7 +18,7 @@ export default function ChatPage() {
   const [closed, setClosed] = useState(false);
   const messagesEndRef = useRef(null);
   const lastMsgId = useRef(0);
-  const pollRef = useRef(null);
+  const wsRef = useRef(null);
 
   // Voice recording state
   const [recording, setRecording] = useState(false);
@@ -65,32 +66,31 @@ export default function ChatPage() {
     fetchAll();
   }, [conversationId, sessionToken]);
 
-  // Poll for new messages
-  const poll = useCallback(async () => {
-    if (!conversationId || !sessionToken) return;
-    try {
-      const { data } = await api.get(`/conversations/${conversationId}/messages?token=${sessionToken}&after=${lastMsgId.current}`);
-      if (data.length > 0) {
-        setMessages(prev => {
-          const existingIds = new Set(prev.map(m => m.id));
-          const newMsgs = data.filter(m => !existingIds.has(m.id));
-          return newMsgs.length > 0 ? [...prev, ...newMsgs] : prev;
-        });
-        lastMsgId.current = data[data.length - 1].id;
-        // Detect close message
-        const lastMsg = data[data.length - 1];
-        if (!lastMsg.is_from_visitor && lastMsg.body.includes('clôturée')) {
-          setClosed(true);
-        }
-      }
-    } catch { /* silent */ }
-  }, [conversationId, sessionToken]);
-
+  // WebSocket — messages en temps réel
   useEffect(() => {
-    if (!conversationId || closed) return;
-    pollRef.current = setInterval(poll, POLL_INTERVAL);
-    return () => clearInterval(pollRef.current);
-  }, [conversationId, closed, poll]);
+    if (!conversationId || !sessionToken || closed) return;
+    const ws = new WebSocket(getWsUrl(`conv:${conversationId}`));
+    ws.onmessage = (e) => {
+      try {
+        const event = JSON.parse(e.data);
+        if (event.type === 'new_message') {
+          const msg = event.payload;
+          setMessages(prev => {
+            if (prev.some(m => m.id === msg.id)) return prev;
+            lastMsgId.current = Math.max(lastMsgId.current, msg.id ?? 0);
+            if (!msg.is_from_visitor && msg.body?.includes('clôturée')) setClosed(true);
+            return [...prev, msg];
+          });
+        }
+      } catch { /* ignore */ }
+    };
+    ws.onerror = () => ws.close();
+    wsRef.current = ws;
+    return () => {
+      ws.close();
+      wsRef.current = null;
+    };
+  }, [conversationId, sessionToken, closed]);
 
   // Auto-scroll
   useEffect(() => {
@@ -160,7 +160,10 @@ export default function ChatPage() {
       const { data } = await api.post(`/conversations/${conversationId}/messages?token=${sessionToken}`, fd, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
-      setMessages(prev => prev.map(m => m.id === tempId ? data : m));
+      setMessages(prev => {
+        const without = prev.filter(m => m.id !== tempId);
+        return without.some(m => m.id === data.id) ? without : [...without, data];
+      });
       lastMsgId.current = Math.max(lastMsgId.current, data.id);
     } catch {
       setMessages(prev => prev.map(m => m.id === tempId ? { ...m, _failed: true } : m));
@@ -191,8 +194,11 @@ export default function ChatPage() {
 
     try {
       const { data } = await api.post(`/conversations/${conversationId}/messages?token=${sessionToken}`, { body });
-      // Replace optimistic message with real one
-      setMessages(prev => prev.map(m => m.id === tempId ? data : m));
+      // Remplace le message optimiste (WS peut l'avoir déjà ajouté)
+      setMessages(prev => {
+        const without = prev.filter(m => m.id !== tempId);
+        return without.some(m => m.id === data.id) ? without : [...without, data];
+      });
       lastMsgId.current = Math.max(lastMsgId.current, data.id);
     } catch {
       // Mark as failed
@@ -201,6 +207,8 @@ export default function ChatPage() {
   };
 
   const endChat = () => {
+    wsRef.current?.close();
+    wsRef.current = null;
     sessionStorage.removeItem('mara_chat');
     setConversationId(null);
     setSessionToken(null);

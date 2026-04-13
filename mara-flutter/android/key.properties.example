@@ -1,0 +1,12 @@
+# Keystore configuration for Flutter release build
+# Copy this file to key.properties (never commit key.properties to git)
+#
+# Generate a keystore with:
+#   keytool -genkey -v -keystore upload-keystore.jks \
+#     -storetype JKS -keyalg RSA -keysize 2048 -validity 10000 \
+#     -alias mara-key
+#
+storePassword=YOUR_STORE_PASSWORD
+keyPassword=YOUR_KEY_PASSWORD
+keyAlias=mara-key
+storeFile=../upload-keystore.jks

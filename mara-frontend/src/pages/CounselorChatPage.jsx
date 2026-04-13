@@ -3,8 +3,9 @@ import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import api from '../api';
 import { MessageCircle, Send, Users, Clock, CheckCircle, X, UserPlus, AlertTriangle } from 'lucide-react';
+import { buildWsUrl } from '../utils/ws';
 
-const POLL_INTERVAL = 3000;
+const getWsUrl = (room = '') => buildWsUrl(room || undefined);
 
 export default function CounselorChatPage() {
   const { user } = useAuth();
@@ -16,8 +17,10 @@ export default function CounselorChatPage() {
   const [filter, setFilter] = useState('all');
   const messagesEndRef = useRef(null);
   const lastMsgId = useRef(0);
-  const pollMsgRef = useRef(null);
+  const convWsRef = useRef(null);
+  const listWsRef = useRef(null);
   const pollListRef = useRef(null);
+  const fetchConvsRef = useRef(null);
 
   useEffect(() => {
     if (!user) navigate('/login');
@@ -34,7 +37,7 @@ export default function CounselorChatPage() {
 
   useEffect(() => {
     fetchConversations();
-    pollListRef.current = setInterval(fetchConversations, 5000);
+    pollListRef.current = setInterval(fetchConversations, 10000);
     return () => clearInterval(pollListRef.current);
   }, [fetchConversations]);
 
@@ -49,27 +52,45 @@ export default function CounselorChatPage() {
     } catch { /* silent */ }
   };
 
-  // Poll messages for active conversation
-  const pollMessages = useCallback(async () => {
-    if (!activeConv) return;
-    try {
-      const { data } = await api.get(`/conversations/${activeConv.id}/messages?after=${lastMsgId.current}`);
-      if (data.length > 0) {
-        setMessages(prev => {
-          const existingIds = new Set(prev.map(m => m.id));
-          const newMsgs = data.filter(m => !existingIds.has(m.id));
-          return newMsgs.length > 0 ? [...prev, ...newMsgs] : prev;
-        });
-        lastMsgId.current = data[data.length - 1].id;
-      }
-    } catch { /* silent */ }
-  }, [activeConv]);
+  // Garde fetchConversations à jour pour le handler WS
+  useEffect(() => { fetchConvsRef.current = fetchConversations; }, [fetchConversations]);
 
+  // WS liste — reçoit les événements conversation_activity
   useEffect(() => {
-    if (!activeConv) return;
-    pollMsgRef.current = setInterval(pollMessages, POLL_INTERVAL);
-    return () => clearInterval(pollMsgRef.current);
-  }, [activeConv, pollMessages]);
+    const ws = new WebSocket(getWsUrl());
+    ws.onmessage = (e) => {
+      try {
+        const ev = JSON.parse(e.data);
+        if (ev.type === 'conversation_activity') fetchConvsRef.current?.();
+      } catch { /* ignore */ }
+    };
+    ws.onerror = () => ws.close();
+    listWsRef.current = ws;
+    return () => { ws.close(); listWsRef.current = null; };
+  }, []);
+
+  // WS conversation active — reçoit les new_message en temps réel
+  useEffect(() => {
+    if (!activeConv?.id) return;
+    convWsRef.current?.close();
+    const ws = new WebSocket(getWsUrl(`conv:${activeConv.id}`));
+    ws.onmessage = (e) => {
+      try {
+        const ev = JSON.parse(e.data);
+        if (ev.type === 'new_message') {
+          const msg = ev.payload;
+          setMessages(prev => {
+            if (prev.some(m => m.id === msg.id)) return prev;
+            lastMsgId.current = Math.max(lastMsgId.current, msg.id ?? 0);
+            return [...prev, msg];
+          });
+        }
+      } catch { /* ignore */ }
+    };
+    ws.onerror = () => ws.close();
+    convWsRef.current = ws;
+    return () => { ws.close(); convWsRef.current = null; };
+  }, [activeConv?.id]);
 
   // Auto-scroll
   useEffect(() => {
@@ -87,9 +108,13 @@ export default function CounselorChatPage() {
 
     try {
       const { data } = await api.post(`/conversations/${activeConv.id}/messages`, { body });
-      setMessages(prev => prev.map(m => m.id === tempId ? data : m));
+      // Remplace le message optimiste (WS peut l'avoir déjà ajouté)
+      setMessages(prev => {
+        const without = prev.filter(m => m.id !== tempId);
+        return without.some(m => m.id === data.id) ? without : [...without, data];
+      });
       lastMsgId.current = Math.max(lastMsgId.current, data.id);
-      // Update conversation list immediately
+      // Mise à jour immédiate de la liste
       fetchConversations();
     } catch {
       setMessages(prev => prev.map(m => m.id === tempId ? { ...m, _failed: true } : m));

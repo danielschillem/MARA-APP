@@ -2,72 +2,98 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, develop]
   pull_request:
     branches: [main]
 
 jobs:
-  # ──────────────────────────────────────────
-  #  Frontend – install, lint, build
-  # ──────────────────────────────────────────
+  # ─── Go Backend ─────────────────────────────────────────────
+  backend:
+    name: Go Backend
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: mara-go-backend
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: mara-go-backend/go.mod
+          cache-dependency-path: mara-go-backend/go.sum
+
+      - name: Download dependencies
+        run: go mod download
+
+      - name: Build
+        run: go build ./...
+
+      - name: Run tests
+        run: go test ./internal/... -timeout 120s -race -coverprofile=coverage.out
+
+      - name: Upload coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: go-coverage
+          path: mara-go-backend/coverage.out
+
+  # ─── React Frontend ──────────────────────────────────────────
   frontend:
-    name: Frontend (Node 20)
+    name: React Frontend
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: mara-frontend
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
+      - name: Set up Node
+        uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: "20"
           cache: npm
           cache-dependency-path: mara-frontend/package-lock.json
 
       - name: Install dependencies
         run: npm ci
 
+      - name: Run tests
+        run: npm test
+
       - name: Build
         run: npm run build
         env:
-          VITE_API_URL: https://mara-api.onrender.com/api
+          VITE_API_URL: /api
 
-  # ──────────────────────────────────────────
-  #  Backend – install, test (SQLite in-memory)
-  # ──────────────────────────────────────────
-  backend:
-    name: Backend (PHP 8.2)
+  # ─── Flutter Mobile ──────────────────────────────────────────
+  flutter:
+    name: Flutter Mobile
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: mara-backend
+        working-directory: mara-flutter
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
         with:
-          php-version: "8.2"
-          extensions: pdo_sqlite, mbstring, zip, bcmath, intl, pcntl
-          coverage: none
+          flutter-version: "3.27.0"
+          channel: stable
+          cache: true
 
-      - name: Install Composer dependencies
-        run: composer install --no-interaction --prefer-dist --no-progress
+      - name: Install dependencies
+        run: flutter pub get
 
-      - name: Copy .env
-        run: cp .env.example .env
+      - name: Analyze
+        run: flutter analyze lib/ --no-fatal-infos
 
-      - name: Generate application key
-        run: php artisan key:generate
-
-      - name: Run tests
-        run: php artisan test
-        env:
-          DB_CONNECTION: sqlite
-          DB_DATABASE: ":memory:"
-          SESSION_DRIVER: array
-          CACHE_STORE: array
-          QUEUE_CONNECTION: sync
+      - name: Run unit tests
+        run: flutter test

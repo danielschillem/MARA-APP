@@ -2,88 +2,61 @@
 #  render.yaml – Infrastructure-as-Code for Render
 #  Docs: https://render.com/docs/blueprint-spec
 #
-#  After first deploy, update APP_URL with the actual
-#  Render service URL (e.g. https://mara-api.onrender.com)
-#  and FRONTEND_URL with your Netlify URL.
+#  Déploiement automatique via:
+#    git push origin main
+#  ou webhook GitHub Actions (voir .github/workflows/deploy-backend.yml)
+#
+#  ⚠️  Après le premier déploiement, mettez à jour FRONTEND_URL
+#     et FLUTTER_URL avec votre URL Netlify réelle.
 # ============================================================
 
 services:
   - type: web
     name: mara-api
-    env: docker
-    dockerfilePath: ./mara-backend/Dockerfile
-    dockerContext: ./mara-backend
+    env: go
+    rootDir: ./mara-go-backend
+    buildCommand: go build -o mara-api ./cmd/server
+    startCommand: ./mara-api
     plan: free
-    healthCheckPath: /up
+    healthCheckPath: /api/health
+    autoDeploy: true
 
     envVars:
-      # ── App ──────────────────────────────────────────────
-      - key: APP_NAME
-        value: MARA
+      # ── Serveur ───────────────────────────────────────────────
+      - key: PORT
+        value: "10000"          # Render injecte $PORT automatiquement (10000 en production)
       - key: APP_ENV
         value: production
-      - key: APP_KEY
-        generateValue: true          # Render generates a unique key on first deploy
-      - key: APP_DEBUG
+      - key: DB_SEED
         value: "false"
-      - key: APP_URL
-        value: https://mara-api.onrender.com   # ← update after first deploy
-      - key: APP_LOCALE
-        value: fr
-      - key: APP_FALLBACK_LOCALE
-        value: en
 
-      # ── CORS ─────────────────────────────────────────────
+      # ── CORS ─────────────────────────────────────────────────
       - key: FRONTEND_URL
-        value: https://mara-app.netlify.app     # ← update with your Netlify URL
+        value: https://mara-app.netlify.app     # ← remplacer avec votre URL Netlify
+      - key: FLUTTER_URL
+        value: https://mara-app.netlify.app     # ← remplacer si domaine Flutter différent
 
-      # ── Database (PostgreSQL – linked from databases block)
-      - key: DB_CONNECTION
-        value: pgsql
-      - key: DB_HOST
+      # ── Auth ─────────────────────────────────────────────────
+      - key: JWT_SECRET
+        generateValue: true                     # Auto-généré par Render (32+ chars)
+
+      # ── Base de données (PostgreSQL – liée depuis le bloc databases)
+      - key: DATABASE_URL
         fromDatabase:
           name: mara-db
-          property: host
-      - key: DB_PORT
-        fromDatabase:
-          name: mara-db
-          property: port
-      - key: DB_DATABASE
-        fromDatabase:
-          name: mara-db
-          property: database
-      - key: DB_USERNAME
-        fromDatabase:
-          name: mara-db
-          property: user
-      - key: DB_PASSWORD
-        fromDatabase:
-          name: mara-db
-          property: password
+          property: connectionString
 
-      # ── Session / Cache / Queue ───────────────────────────
-      - key: SESSION_DRIVER
-        value: cookie
-      - key: SESSION_LIFETIME
-        value: "120"
-      - key: CACHE_STORE
-        value: file
-      - key: QUEUE_CONNECTION
-        value: sync
+      # ── Upload fichiers ─────────────────────────────────────
+      - key: MAX_UPLOAD_MB
+        value: "20"
+      - key: UPLOAD_DIR
+        value: uploads
 
-      # ── Logging ──────────────────────────────────────────
-      - key: LOG_CHANNEL
-        value: stderr
-      - key: LOG_LEVEL
-        value: error
+      # ── APIs externes ─────────────────────────────────────────
+      - key: RELIEFWEB_URL
+        value: https://api.reliefweb.int/v1
 
-      # ── Misc ─────────────────────────────────────────────
-      - key: FILESYSTEM_DISK
-        value: local
-      - key: BCRYPT_ROUNDS
-        value: "12"
-
-# ── Managed PostgreSQL database ──────────────────────────────
+# ── PostgreSQL managé ────────────────────────────────────────
 databases:
   - name: mara-db
     plan: free

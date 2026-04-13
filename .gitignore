@@ -13,20 +13,22 @@ Thumbs.db
 *.env.backup
 *.env.production
 
-# Backend
-mara-backend/vendor/
-mara-backend/node_modules/
-mara-backend/.env
-mara-backend/storage/*.key
-mara-backend/public/hot
-mara-backend/public/storage
-mara-backend/public/build
-mara-backend/.phpunit.cache
-mara-backend/database/database.sqlite
+# Go backend
+mara-go-backend/mara-api
+mara-go-backend/mara-api.exe
+mara-go-backend/*.db
+mara-go-backend/*.db-shm
+mara-go-backend/*.db-wal
 
 # Frontend
 mara-frontend/node_modules/
 mara-frontend/dist/
+
+# Flutter
+mara-flutter/.dart_tool/
+mara-flutter/.flutter-plugins
+mara-flutter/.flutter-plugins-dependencies
+mara-flutter/build/
 
 # Local Netlify folder
 .netlify

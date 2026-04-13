@@ -8,15 +8,18 @@ export default defineConfig({
     port: 5173,
     proxy: {
       '/api': {
-        target: 'http://localhost:8000',
+        target: 'http://localhost:8081',
         changeOrigin: true,
-        secure: false,
-      },
-      '/sanctum': {
-        target: 'http://localhost:8000',
-        changeOrigin: true,
-        secure: false,
+        secure: false, ws: true,
       },
     },
+  },
+  test: {
+    globals: true,
+    environment: 'jsdom',
+    setupFiles: './src/test/setup.js',
+    css: false,
+    pool: 'forks',
+    singleFork: true,
   },
 })

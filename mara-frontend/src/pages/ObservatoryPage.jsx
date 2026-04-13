@@ -26,7 +26,7 @@ export default function ObservatoryPage() {
   useEffect(() => {
     api.get('/observatory/stats')
       .then(r => setStats(r.data))
-      .catch(() => {})
+      .catch(() => { })
       .finally(() => setLoading(false));
   }, []);
 
@@ -36,7 +36,9 @@ export default function ObservatoryPage() {
     if (filters.source) params.source = filters.source;
     if (filters.year) params.year = filters.year;
     if (filters.format) params.format = filters.format;
-    api.get('/observatory/reports', { params }).then(r => setReports(r.data)).catch(() => {});
+    api.get('/observatory/reliefweb')
+      .then(r => setReports(r.data))
+      .catch(() => { });
   }, [filters]);
 
   useEffect(() => {
@@ -46,7 +48,7 @@ export default function ObservatoryPage() {
   const handleSync = async () => {
     setSyncing(true);
     try {
-      await api.post('/observatory/sync');
+      await api.post('/observatory/reliefweb/sync');
       const r = await api.get('/observatory/stats');
       setStats(r.data);
     } catch { /* ignore */ }

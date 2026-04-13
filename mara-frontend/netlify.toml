@@ -12,7 +12,10 @@
   publish = "dist"
 
 [build.environment]
-  NODE_VERSION = "20"
+  NODE_VERSION   = "20"
+  # Set VITE_API_URL in Netlify UI (Site → Environment variables)
+  # VITE_API_URL = "https://mara-api.onrender.com/api"
+  VITE_API_URL   = "https://mara-api.onrender.com/api"
 
 # ── SPA fallback: all routes return index.html (React Router) ──
 [[redirects]]

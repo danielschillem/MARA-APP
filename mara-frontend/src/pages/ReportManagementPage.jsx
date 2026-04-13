@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import api from '../api';
-import { FileText, Search, Filter, X, ChevronLeft, ChevronRight, Edit3, UserPlus, Save, AlertTriangle, MapPin, Calendar, Clock, User, Shield } from 'lucide-react';
+import { FileText, Search, Filter, X, ChevronLeft, ChevronRight, Edit3, UserPlus, Save, AlertTriangle, MapPin, Calendar, Clock, User, Shield, Download } from 'lucide-react';
 
 const STATUS_LABELS = { nouveau: 'Nouveau', en_cours: 'En cours', resolu: 'Résolu', urgent: 'Urgent', cloture: 'Clôturé' };
 const STATUS_BADGE = { nouveau: 'badge-purple', en_cours: 'badge-warning', resolu: 'badge-success', urgent: 'badge-danger', cloture: 'badge-orange' };
@@ -107,6 +107,15 @@ export default function ReportManagementPage() {
           <h2 style={{ fontSize: 24, fontWeight: 800 }}>Gestion des signalements</h2>
           <p style={{ color: 'var(--text-light)', fontSize: 14 }}>{meta.total || 0} signalements au total</p>
         </div>
+        <a
+          href={`${import.meta.env.VITE_API_URL || 'http://localhost:8081/api'}/reports/export${filters.status ? `?status=${filters.status}` : ''}${filters.priority ? `&priority=${filters.priority}` : ''}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="btn btn-outline"
+          style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13 }}
+        >
+          <Download size={14} /> Exporter CSV
+        </a>
       </div>
 
       {/* Filters bar */}

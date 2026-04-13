@@ -1,0 +1,234 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
+import 'package:mara_flutter/core/services/api_service.dart';
+import 'package:mara_flutter/core/theme/app_theme.dart';
+import 'package:mara_flutter/shared/models/alert_model.dart';
+
+class MapScreen extends StatefulWidget {
+  const MapScreen({super.key});
+
+  @override
+  State<MapScreen> createState() => _MapScreenState();
+}
+
+class _MapScreenState extends State<MapScreen> {
+  List<dynamic> _alerts = [];
+  String _filter = 'all';
+  bool _loading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadAlerts();
+  }
+
+  Future<void> _loadAlerts() async {
+    try {
+      final api = ApiService();
+      final data = await api.getMapAlerts();
+      setState(() {
+        _alerts = data;
+        _loading = false;
+      });
+    } catch (_) {
+      setState(() => _loading = false);
+    }
+  }
+
+  Color _severityColor(String severity) {
+    switch (severity) {
+      case 'critical':
+        return AppColors.red;
+      case 'high':
+        return AppColors.orange;
+      case 'medium':
+        return AppColors.amber;
+      default:
+        return AppColors.green;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Stack(
+        children: [
+          FlutterMap(
+            options: MapOptions(
+              initialCenter: const LatLng(5.36, -4.00), // Abidjan
+              initialZoom: 11.5,
+            ),
+            children: [
+              TileLayer(
+                urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                userAgentPackageName: 'bf.mara.flutter',
+              ),
+              if (!_loading)
+                MarkerLayer(
+                  markers: _alerts
+                      .where((a) {
+                        if (_filter == 'all') return true;
+                        return a['severity'] == _filter ||
+                            a['type_id'] == _filter;
+                      })
+                      .map((a) => Marker(
+                            point: LatLng(
+                              (a['lat'] ?? 5.36).toDouble(),
+                              (a['lng'] ?? -4.00).toDouble(),
+                            ),
+                            width: 32,
+                            height: 32,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: _severityColor(a['severity'] ?? 'medium'),
+                                shape: BoxShape.circle,
+                                border:
+                                    Border.all(color: Colors.white, width: 2),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: _severityColor(
+                                            a['severity'] ?? 'medium')
+                                        .withOpacity(0.5),
+                                    blurRadius: 8,
+                                  ),
+                                ],
+                              ),
+                              child: const Icon(Icons.warning_rounded,
+                                  size: 14, color: Colors.white),
+                            ),
+                          ))
+                      .toList(),
+                ),
+            ],
+          ),
+
+          // Legend
+          Positioned(
+            top: 60,
+            right: 12,
+            child: Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.95),
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 8),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text('Niveau de risque',
+                      style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.ink)),
+                  const SizedBox(height: 8),
+                  _LegendRow(color: AppColors.red, label: 'Critique'),
+                  _LegendRow(color: AppColors.orange, label: 'Élevé'),
+                  _LegendRow(color: AppColors.amber, label: 'Modéré'),
+                  _LegendRow(color: AppColors.green, label: 'Faible'),
+                ],
+              ),
+            ),
+          ),
+
+          // Filter bar
+          Positioned(
+            bottom: 20,
+            left: 12,
+            right: 12,
+            child: Container(
+              height: 40,
+              child: ListView(
+                scrollDirection: Axis.horizontal,
+                children: [
+                  _FilterChip(
+                      label: 'Toutes',
+                      active: _filter == 'all',
+                      onTap: () => setState(() => _filter = 'all')),
+                  _FilterChip(
+                      label: 'Police',
+                      active: _filter == 'police',
+                      onTap: () => setState(() => _filter = 'police')),
+                  _FilterChip(
+                      label: 'Hôpitaux',
+                      active: _filter == 'health',
+                      onTap: () => setState(() => _filter = 'health')),
+                  _FilterChip(
+                      label: 'Refuges',
+                      active: _filter == 'refuge',
+                      onTap: () => setState(() => _filter = 'refuge')),
+                  _FilterChip(
+                      label: 'Critiques',
+                      active: _filter == 'critical',
+                      onTap: () => setState(() => _filter = 'critical')),
+                ],
+              ),
+            ),
+          ),
+
+          if (_loading)
+            const Center(child: CircularProgressIndicator()),
+        ],
+      ),
+    );
+  }
+}
+
+class _LegendRow extends StatelessWidget {
+  final Color color;
+  final String label;
+  const _LegendRow({required this.color, required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 5),
+      child: Row(
+        children: [
+          Container(
+              width: 8,
+              height: 8,
+              decoration: BoxDecoration(shape: BoxShape.circle, color: color)),
+          const SizedBox(width: 6),
+          Text(label,
+              style: const TextStyle(fontSize: 10, color: AppColors.sub)),
+        ],
+      ),
+    );
+  }
+}
+
+class _FilterChip extends StatelessWidget {
+  final String label;
+  final bool active;
+  final VoidCallback onTap;
+
+  const _FilterChip(
+      {required this.label, required this.active, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        margin: const EdgeInsets.only(right: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        decoration: BoxDecoration(
+          color: active ? AppColors.navy : Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 4),
+          ],
+        ),
+        child: Text(label,
+            style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: active ? Colors.white : AppColors.ink)),
+      ),
+    );
+  }
+}

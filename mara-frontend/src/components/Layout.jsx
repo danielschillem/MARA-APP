@@ -7,7 +7,7 @@ import {
   Shield, LogOut, User, Globe, Menu, X, Phone,
   Home, FileText, ClipboardList, MessageCircle,
   LayoutDashboard, AlertTriangle, MessagesSquare,
-  BookOpen, MapPin, Moon, Sun, BarChart3
+  BookOpen, MapPin, Moon, Sun, BarChart3, Bell, Users
 } from 'lucide-react';
 import MaraLogo from './MaraLogo';
 import TextToSpeech from './TextToSpeech';
@@ -27,6 +27,8 @@ const NAV_ITEMS_AUTH = [
   { to: '/dashboard', icon: LayoutDashboard, labelKey: 'nav.dashboard' },
   { to: '/signalements', icon: AlertTriangle, label: 'Signalements' },
   { to: '/conversations', icon: MessagesSquare, label: 'Conversations' },
+  { to: '/alertes', icon: Bell, label: 'Alertes' },
+  { to: '/equipe', icon: Users, label: 'Équipe' },
   { to: '/profil', icon: User, label: 'Profil' },
 ];
 
@@ -45,7 +47,7 @@ export default function Layout() {
   }, [darkMode]);
 
   useEffect(() => {
-    api.get('/sos-numbers').then(r => setSosNumbers(r.data)).catch(() => {});
+    api.get('/sos-numbers').then(r => setSosNumbers(r.data)).catch(() => { });
   }, []);
 
   const handleQuickExit = () => {

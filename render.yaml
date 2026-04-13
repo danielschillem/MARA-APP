@@ -28,7 +28,7 @@ services:
       - key: APP_ENV
         value: production
       - key: DB_SEED
-        value: "false"
+        value: "true"
 
       # ── CORS ─────────────────────────────────────────────────
       - key: FRONTEND_URL

@@ -32,9 +32,8 @@ class AppTheme {
         brightness: Brightness.light,
       ),
       scaffoldBackgroundColor: AppColors.bg,
-      textTheme:
-          GoogleFonts.sourceSerif4TextTheme(ThemeData.light().textTheme)
-              .copyWith(
+      textTheme: GoogleFonts.sourceSerif4TextTheme(ThemeData.light().textTheme)
+          .copyWith(
         displayLarge: GoogleFonts.playfairDisplay(
           fontWeight: FontWeight.w800,
           color: AppColors.ink,

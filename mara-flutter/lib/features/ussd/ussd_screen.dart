@@ -129,7 +129,8 @@ Référence : VLP-${DateTime.now().millisecond.toString().padLeft(4, '0')}-${Dat
                   const Text(
                     'Code USSD universel · Fonctionne sans internet\nSur tous les réseaux · Même en prépayé',
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 12, color: Colors.white70, height: 1.6),
+                    style: TextStyle(
+                        fontSize: 12, color: Colors.white70, height: 1.6),
                   ),
                 ],
               ),
@@ -153,10 +154,12 @@ Référence : VLP-${DateTime.now().millisecond.toString().padLeft(4, '0')}-${Dat
                 children: [
                   // Header bar
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 14, vertical: 10),
                     decoration: const BoxDecoration(
                       color: Color(0xFF2C2C2E),
-                      borderRadius: BorderRadius.vertical(top: Radius.circular(14)),
+                      borderRadius:
+                          BorderRadius.vertical(top: Radius.circular(14)),
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -166,8 +169,12 @@ Référence : VLP-${DateTime.now().millisecond.toString().padLeft(4, '0')}-${Dat
                                 fontSize: 11,
                                 fontWeight: FontWeight.w600,
                                 color: Colors.white70)),
-                        Text(_ussdStep == 0 ? 'Menu principal' : 'Étape ${_ussdStep + 1}',
-                            style: const TextStyle(fontSize: 11, color: Colors.white38)),
+                        Text(
+                            _ussdStep == 0
+                                ? 'Menu principal'
+                                : 'Étape ${_ussdStep + 1}',
+                            style: const TextStyle(
+                                fontSize: 11, color: Colors.white38)),
                       ],
                     ),
                   ),
@@ -191,7 +198,8 @@ Référence : VLP-${DateTime.now().millisecond.toString().padLeft(4, '0')}-${Dat
                       children: [
                         Expanded(
                           child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 8),
                             decoration: BoxDecoration(
                                 color: const Color(0xFF2C2C2E),
                                 borderRadius: BorderRadius.circular(8)),
@@ -240,6 +248,22 @@ Référence : VLP-${DateTime.now().millisecond.toString().padLeft(4, '0')}-${Dat
                         _buildKeyRow(['7', '8', '9']),
                         const SizedBox(height: 6),
                         _buildKeyRow(['*', '0', '#']),
+                        const SizedBox(height: 6),
+                        GestureDetector(
+                          onTap: _backspace,
+                          child: Container(
+                            margin: const EdgeInsets.symmetric(horizontal: 3),
+                            padding: const EdgeInsets.symmetric(vertical: 10),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF3A3A3C),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: const Center(
+                              child: Icon(Icons.backspace_outlined,
+                                  color: Colors.white, size: 20),
+                            ),
+                          ),
+                        ),
                       ],
                     ),
                   ),

@@ -354,7 +354,7 @@ class _ReportScreenState extends State<ReportScreen> {
               color: AppColors.greenLight,
               boxShadow: [
                 BoxShadow(
-                    color: AppColors.green.withOpacity(0.07),
+                    color: AppColors.green.withValues(alpha: 0.07),
                     blurRadius: 0,
                     spreadRadius: 14),
               ],
@@ -505,9 +505,9 @@ class _IdentityCard extends StatelessWidget {
                     padding:
                         const EdgeInsets.symmetric(horizontal: 9, vertical: 2),
                     decoration: BoxDecoration(
-                      border: Border.all(color: badgeColor.withOpacity(0.3)),
+                      border: Border.all(color: badgeColor.withValues(alpha: 0.3)),
                       borderRadius: BorderRadius.circular(20),
-                      color: badgeColor.withOpacity(0.08),
+                      color: badgeColor.withValues(alpha: 0.08),
                     ),
                     child: Text(badge,
                         style: TextStyle(
@@ -664,7 +664,7 @@ class _ToggleBtn extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 11),
         decoration: BoxDecoration(
           color: active
-              ? activeColor.withOpacity(0.08)
+              ? activeColor.withValues(alpha: 0.08)
               : const Color(0xFFFAFAFA),
           border: Border.all(
               color: active ? activeColor : AppColors.border, width: 1.5),
@@ -705,7 +705,7 @@ class _MediaBtn extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 14),
         decoration: BoxDecoration(
           color: active
-              ? activeColor.withOpacity(0.08)
+              ? activeColor.withValues(alpha: 0.08)
               : const Color(0xFFFAFAFA),
           border: Border.all(
               color: active ? activeColor : AppColors.border, width: 1.5),

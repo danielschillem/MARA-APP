@@ -32,7 +32,9 @@ class AppTheme {
         brightness: Brightness.light,
       ),
       scaffoldBackgroundColor: AppColors.bg,
-      textTheme: GoogleFonts.sourceSerifProTextTheme().copyWith(
+      textTheme:
+          GoogleFonts.sourceSerif4TextTheme(ThemeData.light().textTheme)
+              .copyWith(
         displayLarge: GoogleFonts.playfairDisplay(
           fontWeight: FontWeight.w800,
           color: AppColors.ink,
@@ -60,7 +62,8 @@ class AppTheme {
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.red,
           foregroundColor: AppColors.white,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
           padding: const EdgeInsets.symmetric(vertical: 14),
           textStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
         ),

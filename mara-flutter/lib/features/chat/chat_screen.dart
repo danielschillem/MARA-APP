@@ -179,7 +179,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   decoration: BoxDecoration(
                     color: AppColors.greenLight,
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: AppColors.green.withOpacity(.3)),
+                    border: Border.all(color: AppColors.green.withValues(alpha: .3)),
                   ),
                   child: Row(
                     children: [
@@ -285,7 +285,7 @@ class _BubbleWidget extends StatelessWidget {
           ),
           boxShadow: [
             BoxShadow(
-                color: Colors.black.withOpacity(.06),
+                color: Colors.black.withValues(alpha: .06),
                 blurRadius: 6,
                 offset: const Offset(0, 2))
           ],

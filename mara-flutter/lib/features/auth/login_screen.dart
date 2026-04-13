@@ -123,10 +123,10 @@ class _LoginScreenState extends State<LoginScreen> {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 14, vertical: 10),
                       decoration: BoxDecoration(
-                        color: AppColors.red.withOpacity(.15),
+                        color: AppColors.red.withValues(alpha: .15),
                         borderRadius: BorderRadius.circular(10),
                         border:
-                            Border.all(color: AppColors.red.withOpacity(.4)),
+                            Border.all(color: AppColors.red.withValues(alpha: .4)),
                       ),
                       child: Row(
                         children: [
@@ -154,7 +154,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(14)),
-                        disabledBackgroundColor: AppColors.red.withOpacity(.5),
+                        disabledBackgroundColor: AppColors.red.withValues(alpha: .5),
                       ),
                       child: _loading
                           ? const SizedBox(
@@ -223,7 +223,7 @@ class _Field extends StatelessWidget {
         prefixIcon: Icon(icon, color: Colors.white54, size: 20),
         suffixIcon: suffixIcon,
         filled: true,
-        fillColor: Colors.white.withOpacity(.07),
+        fillColor: Colors.white.withValues(alpha: .07),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide.none,

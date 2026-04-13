@@ -5,7 +5,6 @@ import 'package:geolocator/geolocator.dart';
 import 'package:mara_flutter/core/theme/app_theme.dart';
 import 'package:mara_flutter/core/services/api_service.dart';
 import 'package:mara_flutter/core/services/offline_service.dart';
-import 'package:mara_flutter/shared/models/alert_model.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:go_router/go_router.dart';
 
@@ -47,7 +46,7 @@ class _SosScreenState extends State<SosScreen> with TickerProviderStateMixin {
   Future<void> _checkConnectivity() async {
     final result = await Connectivity().checkConnectivity();
     setState(() {
-      _isOnline = result != ConnectivityResult.none;
+      _isOnline = !result.contains(ConnectivityResult.none);
     });
   }
 
@@ -215,11 +214,15 @@ class _SosScreenState extends State<SosScreen> with TickerProviderStateMixin {
           Container(
             width: 7,
             height: 7,
-            decoration: const BoxDecoration(shape: BoxShape.circle, color: Colors.white),
+            decoration: const BoxDecoration(
+                shape: BoxShape.circle, color: Colors.white),
           ),
           const SizedBox(width: 8),
           const Text('Mode hors-ligne — alertes sauvegardées localement',
-              style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w600)),
+              style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600)),
         ],
       ),
     );
@@ -262,14 +265,14 @@ class _SosScreenState extends State<SosScreen> with TickerProviderStateMixin {
                         ? []
                         : [
                             BoxShadow(
-                              color: AppColors.red.withOpacity(
-                                  0.06 + 0.04 * _pulseController.value),
+                              color: AppColors.red.withValues(
+                                  alpha: 0.06 + 0.04 * _pulseController.value),
                               blurRadius: 14 + 14 * _pulseController.value,
                               spreadRadius: 14 + 14 * _pulseController.value,
                             ),
                             BoxShadow(
-                              color: AppColors.red.withOpacity(
-                                  0.03 + 0.02 * _pulseController.value),
+                              color: AppColors.red.withValues(
+                                  alpha: 0.03 + 0.02 * _pulseController.value),
                               blurRadius: 28 + 28 * _pulseController.value,
                               spreadRadius: 28 + 28 * _pulseController.value,
                             ),
@@ -295,7 +298,8 @@ class _SosScreenState extends State<SosScreen> with TickerProviderStateMixin {
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: AppColors.red.withOpacity(_pressing ? 0.3 : 0.4),
+                        color: AppColors.red
+                            .withValues(alpha: _pressing ? 0.3 : 0.4),
                         blurRadius: _pressing ? 14 : 36,
                         offset: Offset(0, _pressing ? 4 : 10),
                       ),
@@ -304,7 +308,8 @@ class _SosScreenState extends State<SosScreen> with TickerProviderStateMixin {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.warning_rounded, color: Colors.white, size: 28),
+                      Icon(Icons.warning_rounded,
+                          color: Colors.white, size: 28),
                       const SizedBox(height: 4),
                       const Text('SOS',
                           style: TextStyle(
@@ -326,7 +331,7 @@ class _SosScreenState extends State<SosScreen> with TickerProviderStateMixin {
           opacity: _pressing ? 1.0 : 0.0,
           duration: const Duration(milliseconds: 200),
           child: Text(
-            'Maintenez appuyé — ${(( 1 - _pressProgress) * 2.5).toStringAsFixed(1)}s',
+            'Maintenez appuyé — ${((1 - _pressProgress) * 2.5).toStringAsFixed(1)}s',
             style: const TextStyle(fontSize: 12, color: AppColors.red),
           ),
         ),
@@ -349,7 +354,8 @@ class _SosScreenState extends State<SosScreen> with TickerProviderStateMixin {
           height: 80,
           decoration: const BoxDecoration(
               shape: BoxShape.circle, color: AppColors.greenLight),
-          child: const Icon(Icons.check_rounded, color: AppColors.green, size: 36),
+          child:
+              const Icon(Icons.check_rounded, color: AppColors.green, size: 36),
         ),
         const SizedBox(height: 16),
         const Text('Alerte envoyée',
@@ -378,7 +384,10 @@ class _SosScreenState extends State<SosScreen> with TickerProviderStateMixin {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const Text('Référence',
-                    style: TextStyle(fontSize: 10, color: AppColors.muted, letterSpacing: 0.06)),
+                    style: TextStyle(
+                        fontSize: 10,
+                        color: AppColors.muted,
+                        letterSpacing: 0.06)),
                 Text(_reference!,
                     style: const TextStyle(
                         fontSize: 13,
@@ -401,9 +410,11 @@ class _SosScreenState extends State<SosScreen> with TickerProviderStateMixin {
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.green,
               minimumSize: const Size(double.infinity, 48),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14)),
             ),
-            child: const Text('Retour à l\'accueil', style: TextStyle(color: Colors.white)),
+            child: const Text('Retour à l\'accueil',
+                style: TextStyle(color: Colors.white)),
           ),
         ),
       ],

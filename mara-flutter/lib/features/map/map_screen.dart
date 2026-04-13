@@ -3,7 +3,6 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:mara_flutter/core/services/api_service.dart';
 import 'package:mara_flutter/core/theme/app_theme.dart';
-import 'package:mara_flutter/shared/models/alert_model.dart';
 
 class MapScreen extends StatefulWidget {
   const MapScreen({super.key});
@@ -81,7 +80,8 @@ class _MapScreenState extends State<MapScreen> {
                             height: 32,
                             child: Container(
                               decoration: BoxDecoration(
-                                color: _severityColor(a['severity'] ?? 'medium'),
+                                color:
+                                    _severityColor(a['severity'] ?? 'medium'),
                                 shape: BoxShape.circle,
                                 border:
                                     Border.all(color: Colors.white, width: 2),
@@ -89,7 +89,7 @@ class _MapScreenState extends State<MapScreen> {
                                   BoxShadow(
                                     color: _severityColor(
                                             a['severity'] ?? 'medium')
-                                        .withOpacity(0.5),
+                                        .withValues(alpha: 0.5),
                                     blurRadius: 8,
                                   ),
                                 ],
@@ -110,10 +110,12 @@ class _MapScreenState extends State<MapScreen> {
             child: Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.95),
+                color: Colors.white.withValues(alpha: 0.95),
                 borderRadius: BorderRadius.circular(12),
                 boxShadow: [
-                  BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 8),
+                  BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.1),
+                      blurRadius: 8),
                 ],
               ),
               child: Column(
@@ -169,8 +171,7 @@ class _MapScreenState extends State<MapScreen> {
             ),
           ),
 
-          if (_loading)
-            const Center(child: CircularProgressIndicator()),
+          if (_loading) const Center(child: CircularProgressIndicator()),
         ],
       ),
     );
@@ -220,7 +221,8 @@ class _FilterChip extends StatelessWidget {
           color: active ? AppColors.navy : Colors.white,
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
-            BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 4),
+            BoxShadow(
+                color: Colors.black.withValues(alpha: 0.1), blurRadius: 4),
           ],
         ),
         child: Text(label,

@@ -1,5 +1,4 @@
 import 'package:go_router/go_router.dart';
-import 'package:flutter/material.dart';
 import 'package:mara_flutter/core/services/auth_service.dart';
 import 'package:mara_flutter/features/auth/login_screen.dart';
 import 'package:mara_flutter/features/chat/chat_screen.dart';

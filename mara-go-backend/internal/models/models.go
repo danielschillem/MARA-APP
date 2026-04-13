@@ -21,7 +21,7 @@ const (
 type User struct {
 	ID           uint           `json:"id" gorm:"primaryKey"`
 	Name         string         `json:"name" gorm:"not null"`
-	Email        string         `json:"email" gorm:"uniqueIndex;not null"`
+	Email        string         `json:"email" gorm:"not null"`
 	Password     string         `json:"-" gorm:"not null"`
 	Role         UserRole       `json:"role" gorm:"default:'conseiller'"`
 	Titre        string         `json:"titre"`
@@ -39,7 +39,7 @@ type User struct {
 
 type ViolenceType struct {
 	ID      uint   `json:"id" gorm:"primaryKey"`
-	Slug    string `json:"slug" gorm:"uniqueIndex;not null"`
+	Slug    string `json:"slug" gorm:"not null"`
 	LabelFr string `json:"label_fr" gorm:"not null"`
 	Sub     string `json:"sub"`
 	Icon    string `json:"icon"`
@@ -71,7 +71,7 @@ const (
 
 type Report struct {
 	ID           uint           `json:"id" gorm:"primaryKey"`
-	Reference    string         `json:"reference" gorm:"uniqueIndex;not null"`
+	Reference    string         `json:"reference" gorm:"not null"`
 	ReporterType ReporterType   `json:"reporter_type" gorm:"default:'anonymous'"`
 	VictimGender string         `json:"victim_gender"`
 	Region       string         `json:"region"`
@@ -130,7 +130,7 @@ type Conversation struct {
 	ID           uint               `json:"id" gorm:"primaryKey"`
 	UserID       *uint              `json:"user_id"`
 	ConseillerID *uint              `json:"conseiller_id"`
-	SessionToken string             `json:"session_token" gorm:"uniqueIndex"`
+	SessionToken string             `json:"session_token"`
 	Status       ConversationStatus `json:"status" gorm:"default:'open'"`
 	User         *User              `json:"user,omitempty" gorm:"foreignKey:UserID"`
 	Conseiller   *User              `json:"conseiller,omitempty" gorm:"foreignKey:ConseillerID"`
@@ -204,7 +204,7 @@ type Announcement struct {
 
 type ReliefWebReport struct {
 	ID          uint      `json:"id" gorm:"primaryKey"`
-	ExtID       string    `json:"ext_id" gorm:"uniqueIndex"`
+	ExtID       string    `json:"ext_id"`
 	Title       string    `json:"title"`
 	Source      string    `json:"source"`
 	URL         string    `json:"url"`
@@ -218,7 +218,7 @@ type ReliefWebReport struct {
 
 type Alert struct {
 	ID          uint           `json:"id" gorm:"primaryKey"`
-	Reference   string         `json:"reference" gorm:"uniqueIndex;not null"`
+	Reference   string         `json:"reference" gorm:"not null"`
 	TypeID      string         `json:"type_id"`
 	VictimType  string         `json:"victim_type"`
 	Severity    ReportPriority `json:"severity" gorm:"default:'medium'"`

@@ -34,21 +34,6 @@ func Connect(dsn string) *gorm.DB {
 }
 
 func Migrate(db *gorm.DB) {
-	// PostgreSQL: drop unique constraints with IF EXISTS to be idempotent on every deploy
-	if db.Dialector.Name() == "postgres" {
-		stmts := []string{
-			`ALTER TABLE IF EXISTS users DROP CONSTRAINT IF EXISTS uni_users_email`,
-			`ALTER TABLE IF EXISTS violence_types DROP CONSTRAINT IF EXISTS uni_violence_types_slug`,
-			`ALTER TABLE IF EXISTS reports DROP CONSTRAINT IF EXISTS uni_reports_reference`,
-			`ALTER TABLE IF EXISTS conversations DROP CONSTRAINT IF EXISTS uni_conversations_session_token`,
-			`ALTER TABLE IF EXISTS relief_web_reports DROP CONSTRAINT IF EXISTS uni_relief_web_reports_ext_id`,
-			`ALTER TABLE IF EXISTS alerts DROP CONSTRAINT IF EXISTS uni_alerts_reference`,
-		}
-		for _, s := range stmts {
-			db.Exec(s)
-		}
-	}
-
 	err := db.AutoMigrate(
 		&models.User{},
 		&models.ViolenceType{},
@@ -66,6 +51,23 @@ func Migrate(db *gorm.DB) {
 	if err != nil {
 		slog.Error("migration failed", "err", err)
 		os.Exit(1)
+	}
+
+	// Create unique indexes manually — idempotent on both SQLite and PostgreSQL.
+	// We do NOT use GORM's uniqueIndex tag to avoid its internal DROP CONSTRAINT
+	// without IF EXISTS, which crashes on PostgreSQL when the constraint is missing.
+	uniqueIndexes := []string{
+		`CREATE UNIQUE INDEX IF NOT EXISTS uni_users_email ON users(email)`,
+		`CREATE UNIQUE INDEX IF NOT EXISTS uni_violence_types_slug ON violence_types(slug)`,
+		`CREATE UNIQUE INDEX IF NOT EXISTS uni_reports_reference ON reports(reference)`,
+		`CREATE UNIQUE INDEX IF NOT EXISTS uni_conversations_session_token ON conversations(session_token)`,
+		`CREATE UNIQUE INDEX IF NOT EXISTS uni_relief_web_reports_ext_id ON relief_web_reports(ext_id)`,
+		`CREATE UNIQUE INDEX IF NOT EXISTS uni_alerts_reference ON alerts(reference)`,
+	}
+	for _, idx := range uniqueIndexes {
+		if err := db.Exec(idx).Error; err != nil {
+			slog.Warn("unique index skipped (already exists)", "err", err)
+		}
 	}
 }
 

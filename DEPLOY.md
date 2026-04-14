@@ -61,3 +61,46 @@ base64 -w 0 upload-keystore.jks
 4. **Site configuration → Environment variables** → Ajoute :
    - `VITE_API_URL` = `https://mara-api.onrender.com/api`
 5. **Trigger deploy** → Vérifie que ça build correctement
+
+---
+
+## Build Flutter APK (release)
+
+### Prérequis
+- `android/upload-keystore.jks` présent (généré une seule fois via keytool)
+- `android/key.properties` configuré (non commité — dans .gitignore)
+
+### Commandes
+
+```powershell
+# Depuis mara-flutter/
+cd "mara-flutter"
+
+# Build APK release (production)
+flutter build apk --release `
+  --dart-define=API_URL=https://mara-api.onrender.com/api `
+  --dart-define=WS_URL=wss://mara-api.onrender.com/api/ws
+
+# Build APK local (dev)
+flutter build apk --release `
+  --dart-define=API_URL=http://10.0.2.2:8081/api `
+  --dart-define=WS_URL=ws://10.0.2.2:8081/api/ws
+
+# Build App Bundle (Play Store)
+flutter build appbundle --release `
+  --dart-define=API_URL=https://mara-api.onrender.com/api `
+  --dart-define=WS_URL=wss://mara-api.onrender.com/api/ws
+```
+
+L'APK sera dans `build/app/outputs/flutter-apk/app-release.apk`
+
+### Changer le mot de passe keystore avant production
+Édite `android/key.properties` :
+```
+storePassword=VOTRE_NOUVEAU_MOT_DE_PASSE
+keyPassword=VOTRE_NOUVEAU_MOT_DE_PASSE
+keyAlias=mara-key
+storeFile=../upload-keystore.jks
+```
+
+> ⚠️ `android/key.properties` et `*.jks` sont dans `.gitignore` — ne jamais les committer.

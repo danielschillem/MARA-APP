@@ -59,131 +59,135 @@ class _OfflineScreenState extends State<OfflineScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.all(16),
-          children: [
-            // Hero
-            Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: AppColors.accent,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Container(
-                        width: 44,
-                        height: 44,
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.15),
-                          borderRadius: BorderRadius.circular(12),
+        child: RefreshIndicator(
+          color: AppColors.primary,
+          onRefresh: _loadQueue,
+          child: ListView(
+            padding: const EdgeInsets.all(16),
+            children: [
+              // Hero
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: AppColors.accent,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          width: 44,
+                          height: 44,
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.15),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: const Icon(Icons.cloud_off_rounded,
+                              color: Colors.white, size: 22),
                         ),
-                        child: const Icon(Icons.cloud_off_rounded,
-                            color: Colors.white, size: 22),
-                      ),
-                      const SizedBox(width: 12),
-                      const Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('Mode hors-ligne actif',
-                                style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w700,
-                                    color: Colors.white)),
-                            SizedBox(height: 2),
-                            Text('Alertes sauvegardées localement',
-                                style: TextStyle(
-                                    fontSize: 11, color: Colors.white70)),
-                          ],
+                        const SizedBox(width: 12),
+                        const Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('Mode hors-ligne actif',
+                                  style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w700,
+                                      color: Colors.white)),
+                              SizedBox(height: 2),
+                              Text('Alertes sauvegardées localement',
+                                  style: TextStyle(
+                                      fontSize: 11, color: Colors.white70)),
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  const Text(
-                    'Vos alertes seront synchronisées automatiquement dès le retour de la connexion.',
-                    style: TextStyle(
-                        fontSize: 12, color: Colors.white70, height: 1.6),
-                  ),
-                  const SizedBox(height: 14),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _StatBox(
-                            value: '${_queue.length}', label: 'En attente'),
-                      ),
-                      const SizedBox(width: 10),
-                      const Expanded(
-                        child: _StatBox(value: '0', label: 'Synchronisées'),
-                      ),
-                    ],
-                  ),
-                ],
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    const Text(
+                      'Vos alertes seront synchronisées automatiquement dès le retour de la connexion.',
+                      style: TextStyle(
+                          fontSize: 12, color: Colors.white70, height: 1.6),
+                    ),
+                    const SizedBox(height: 14),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _StatBox(
+                              value: '${_queue.length}', label: 'En attente'),
+                        ),
+                        const SizedBox(width: 10),
+                        const Expanded(
+                          child: _StatBox(value: '0', label: 'Synchronisées'),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
-            ),
-            const SizedBox(height: 20),
+              const SizedBox(height: 20),
 
-            const Text('FILE D\'ATTENTE LOCALE',
-                style: TextStyle(
-                    fontSize: 9,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 1.2,
-                    color: AppColors.muted)),
-            const SizedBox(height: 10),
-
-            if (_queue.isEmpty)
-              const Padding(
-                padding: EdgeInsets.symmetric(vertical: 20),
-                child: Text('Aucune alerte en attente',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(color: AppColors.muted)),
-              )
-            else
-              ..._queue.asMap().entries.map((e) => _QueueItem(
-                    index: e.key + 1,
-                    item: e.value,
-                  )),
-
-            if (_syncing) ...[
+              const Text('FILE D\'ATTENTE LOCALE',
+                  style: TextStyle(
+                      fontSize: 9,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 1.2,
+                      color: AppColors.muted)),
               const SizedBox(height: 10),
-              LinearProgressIndicator(
-                value: _syncProgress,
-                backgroundColor: AppColors.border,
-                valueColor:
-                    const AlwaysStoppedAnimation<Color>(AppColors.green),
+
+              if (_queue.isEmpty)
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 20),
+                  child: Text('Aucune alerte en attente',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: AppColors.muted)),
+                )
+              else
+                ..._queue.asMap().entries.map((e) => _QueueItem(
+                      index: e.key + 1,
+                      item: e.value,
+                    )),
+
+              if (_syncing) ...[
+                const SizedBox(height: 10),
+                LinearProgressIndicator(
+                  value: _syncProgress,
+                  backgroundColor: AppColors.border,
+                  valueColor:
+                      const AlwaysStoppedAnimation<Color>(AppColors.green),
+                ),
+              ],
+              const SizedBox(height: 16),
+              ElevatedButton.icon(
+                onPressed: _syncing ? null : _sync,
+                icon: _syncing
+                    ? const SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(
+                            strokeWidth: 2, color: Colors.white),
+                      )
+                    : const Icon(Icons.cloud_sync_rounded,
+                        color: Colors.white, size: 18),
+                label: Text(
+                  _syncing ? 'Synchronisation…' : 'Synchroniser maintenant',
+                  style: const TextStyle(
+                      color: Colors.white, fontWeight: FontWeight.w700),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  minimumSize: const Size(double.infinity, 48),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14)),
+                  elevation: 0,
+                ),
               ),
             ],
-            const SizedBox(height: 16),
-            ElevatedButton.icon(
-              onPressed: _syncing ? null : _sync,
-              icon: _syncing
-                  ? const SizedBox(
-                      width: 16,
-                      height: 16,
-                      child: CircularProgressIndicator(
-                          strokeWidth: 2, color: Colors.white),
-                    )
-                  : const Icon(Icons.cloud_sync_rounded,
-                      color: Colors.white, size: 18),
-              label: Text(
-                _syncing ? 'Synchronisation…' : 'Synchroniser maintenant',
-                style: const TextStyle(
-                    color: Colors.white, fontWeight: FontWeight.w700),
-              ),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                padding: const EdgeInsets.symmetric(vertical: 14),
-                minimumSize: const Size(double.infinity, 48),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14)),
-                elevation: 0,
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );

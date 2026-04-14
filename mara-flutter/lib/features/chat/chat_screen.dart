@@ -5,7 +5,11 @@ import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:mara_flutter/core/services/api_service.dart';
 import 'package:mara_flutter/core/theme/app_theme.dart';
 
-const _wsBase = 'ws://10.0.2.2:8081/api/ws'; // Android emulator → host
+// Derived at compile time. Default for web/iOS; override with --dart-define=WS_URL=wss://api.mara.bf/api/ws
+const _kWsBase = String.fromEnvironment(
+  'WS_URL',
+  defaultValue: 'ws://localhost:8081/api/ws',
+);
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});
@@ -68,7 +72,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
   void _connectWS() {
     if (_convId == null) return;
-    final uri = Uri.parse('$_wsBase?room=conv:$_convId');
+    final uri = Uri.parse('$_kWsBase?room=conv:$_convId');
     _ws = WebSocketChannel.connect(uri);
 
     _ws!.stream.listen(

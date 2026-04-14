@@ -4,6 +4,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:mara_flutter/core/services/api_service.dart';
 import 'package:mara_flutter/core/theme/app_theme.dart';
+import 'package:mara_flutter/shared/widgets/error_banner.dart';
 
 class MapScreen extends StatefulWidget {
   const MapScreen({super.key});
@@ -16,6 +17,7 @@ class _MapScreenState extends State<MapScreen> {
   List<dynamic> _alerts = [];
   String _filter = 'all';
   bool _loading = true;
+  bool _error = false;
   final _mapController = MapController();
   LatLng? _userPosition;
 
@@ -42,6 +44,10 @@ class _MapScreenState extends State<MapScreen> {
   }
 
   Future<void> _loadAlerts() async {
+    setState(() {
+      _loading = true;
+      _error = false;
+    });
     try {
       final api = ApiService();
       final data = await api.getMapAlerts();
@@ -50,7 +56,10 @@ class _MapScreenState extends State<MapScreen> {
         _loading = false;
       });
     } catch (_) {
-      setState(() => _loading = false);
+      setState(() {
+        _loading = false;
+        _error = true;
+      });
     }
   }
 
@@ -212,6 +221,35 @@ class _MapScreenState extends State<MapScreen> {
           ),
 
           if (_loading) const Center(child: CircularProgressIndicator()),
+          if (_error)
+            Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              child: ErrorBanner(
+                message: 'Impossible de charger les alertes.',
+                onRetry: _loadAlerts,
+              ),
+            ),
+          // Refresh button
+          Positioned(
+            top: 12,
+            left: 12,
+            child: GestureDetector(
+              onTap: _loadAlerts,
+              child: Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: AppShadows.sm,
+                ),
+                child: const Icon(Icons.refresh_rounded,
+                    size: 20, color: AppColors.primary),
+              ),
+            ),
+          ),
         ],
       ),
     );

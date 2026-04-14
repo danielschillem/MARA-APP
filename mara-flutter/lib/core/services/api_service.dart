@@ -1,10 +1,15 @@
 import 'package:dio/dio.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
+// URL resolved at compile time via --dart-define=API_URL=https://api.mara.bf
+// Fallbacks: web/iOS → localhost, Android emulator → 10.0.2.2
+const _kApiUrl = String.fromEnvironment(
+  'API_URL',
+  defaultValue: 'http://localhost:8081/api',
+);
+
 class ApiService {
-  static const String _baseUrl =
-      'http://10.0.2.2:8081/api'; // Android emulator → host port 8081
-  // static const String _baseUrl = 'http://localhost:8081/api'; // Web/iOS
+  static const String _baseUrl = _kApiUrl;
 
   late final Dio _dio;
 

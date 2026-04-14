@@ -50,11 +50,12 @@ class _ReportScreenState extends State<ReportScreen> {
     final picker = ImagePicker();
     final picked =
         await picker.pickImage(source: ImageSource.gallery, imageQuality: 70);
-    if (picked != null)
+    if (picked != null) {
       setState(() {
         _imagePath = picked.path;
         _hasPhoto = true;
       });
+    }
   }
 
   Future<void> _getLocation() async {
@@ -105,11 +106,15 @@ class _ReportScreenState extends State<ReportScreen> {
         _step = 4;
       });
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erreur: $e'), backgroundColor: AppColors.red),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              content: Text('Erreur: $e'),
+              backgroundColor: AppColors.red),
+        );
+      }
     } finally {
-      setState(() => _loading = false);
+      if (mounted) setState(() => _loading = false);
     }
   }
 

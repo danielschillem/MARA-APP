@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mara_flutter/core/services/api_service.dart';
 import 'package:mara_flutter/core/theme/app_theme.dart';
+import 'package:mara_flutter/shared/widgets/skeleton_loader.dart';
 
 class ResourcesScreen extends StatefulWidget {
   const ResourcesScreen({super.key});
@@ -56,9 +57,7 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
             _buildCategoryBar(),
             Expanded(
               child: _loading
-                  ? const Center(
-                      child:
-                          CircularProgressIndicator(color: AppColors.primary))
+                  ? const SkeletonList(count: 6)
                   : _resources.isEmpty
                       ? _buildEmpty()
                       : RefreshIndicator(
@@ -401,9 +400,18 @@ class _ResourceDetailScreenState extends State<ResourceDetailScreen> {
             // Content
             Expanded(
               child: _loading
-                  ? const Center(
-                      child:
-                          CircularProgressIndicator(color: AppColors.primary))
+                  ? const Padding(
+                      padding: EdgeInsets.all(20),
+                      child: Column(
+                        children: [
+                          SkeletonLoader(height: 16, radius: BorderRadius.all(Radius.circular(6))),
+                          SizedBox(height: 12),
+                          SkeletonLoader(height: 12, radius: BorderRadius.all(Radius.circular(6))),
+                          SizedBox(height: 24),
+                          SkeletonLoader(height: 200, radius: BorderRadius.all(Radius.circular(10))),
+                        ],
+                      ),
+                    )
                   : _resource == null
                       ? const Center(
                           child: Text('Ressource introuvable.',

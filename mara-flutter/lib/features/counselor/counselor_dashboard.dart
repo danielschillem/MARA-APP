@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:mara_flutter/core/services/api_service.dart';
 import 'package:mara_flutter/core/services/auth_service.dart';
 import 'package:mara_flutter/core/theme/app_theme.dart';
+import 'package:mara_flutter/shared/widgets/skeleton_loader.dart';
 
 class CounselorDashboard extends StatefulWidget {
   const CounselorDashboard({super.key});
@@ -189,8 +190,30 @@ class _CounselorDashboardState extends State<CounselorDashboard>
 
   Widget _buildStatsTab() {
     if (_loadingStats) {
-      return const Center(
-          child: CircularProgressIndicator(color: AppColors.primary));
+      return SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            Row(children: const [
+              Expanded(child: SkeletonStatCard()),
+              SizedBox(width: 12),
+              Expanded(child: SkeletonStatCard()),
+            ]),
+            const SizedBox(height: 12),
+            Row(children: const [
+              Expanded(child: SkeletonStatCard()),
+              SizedBox(width: 12),
+              Expanded(child: SkeletonStatCard()),
+            ]),
+            const SizedBox(height: 12),
+            Row(children: const [
+              Expanded(child: SkeletonStatCard()),
+              SizedBox(width: 12),
+              Expanded(child: SkeletonStatCard()),
+            ]),
+          ],
+        ),
+      );
     }
     if (_stats == null) {
       return const Center(
@@ -339,8 +362,7 @@ class _CounselorDashboardState extends State<CounselorDashboard>
         ),
         Expanded(
           child: _loadingReports
-              ? const Center(
-                  child: CircularProgressIndicator(color: AppColors.primary))
+              ? const SkeletonList(count: 5)
               : _reports.isEmpty
                   ? const Center(
                       child: Text('Aucun signalement.',
@@ -363,8 +385,7 @@ class _CounselorDashboardState extends State<CounselorDashboard>
 
   Widget _buildConvsTab() {
     if (_loadingConvs) {
-      return const Center(
-          child: CircularProgressIndicator(color: AppColors.primary));
+      return const SkeletonList(count: 4);
     }
     if (_conversations.isEmpty) {
       return const Center(

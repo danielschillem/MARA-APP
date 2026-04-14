@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mara_flutter/core/services/api_service.dart';
 import 'package:mara_flutter/core/theme/app_theme.dart';
+import 'package:mara_flutter/shared/widgets/skeleton_loader.dart';
 
 class NotificationsScreen extends StatefulWidget {
   const NotificationsScreen({super.key});
@@ -43,9 +44,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             _buildHeader(context),
             Expanded(
               child: _loading
-                  ? const Center(
-                      child:
-                          CircularProgressIndicator(color: AppColors.primary))
+                  ? const SkeletonList(count: 4)
                   : _announcements.isEmpty
                       ? _buildEmpty()
                       : RefreshIndicator(

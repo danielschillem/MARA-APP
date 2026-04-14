@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mara_flutter/core/services/api_service.dart';
 import 'package:mara_flutter/core/theme/app_theme.dart';
+import 'package:mara_flutter/shared/widgets/skeleton_loader.dart';
 
 class ServicesScreen extends StatefulWidget {
   const ServicesScreen({super.key});
@@ -70,9 +71,7 @@ class _ServicesScreenState extends State<ServicesScreen> {
             const SizedBox(height: 8),
             Expanded(
               child: _loading
-                  ? const Center(
-                      child:
-                          CircularProgressIndicator(color: AppColors.primary))
+                  ? const SkeletonList(count: 5)
                   : _filtered.isEmpty
                       ? _buildEmpty()
                       : RefreshIndicator(

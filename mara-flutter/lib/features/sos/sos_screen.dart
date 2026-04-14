@@ -83,8 +83,10 @@ class _SosScreenState extends State<SosScreen> with TickerProviderStateMixin {
       if (permission != LocationPermission.denied &&
           permission != LocationPermission.deniedForever) {
         position = await Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.high,
-          timeLimit: const Duration(seconds: 5),
+          locationSettings: const LocationSettings(
+            accuracy: LocationAccuracy.high,
+            timeIntervalMilliseconds: 5000,
+          ),
         );
       }
     } catch (_) {}
@@ -642,33 +644,6 @@ class _ChipItem extends StatelessWidget {
           ),
         ),
       ),
-    );
-  }
-}
-
-// ── Status dot indicator ─────────────────────────────────────────────────────
-class _StatusDot extends StatelessWidget {
-  final bool on;
-  final String label;
-  final Color? color;
-  const _StatusDot({required this.on, required this.label, this.color});
-
-  @override
-  Widget build(BuildContext context) {
-    final c = color ?? (on ? AppColors.success : AppColors.muted);
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          width: 6,
-          height: 6,
-          decoration: BoxDecoration(color: c, shape: BoxShape.circle),
-        ),
-        const SizedBox(width: 4),
-        Text(label,
-            style:
-                TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: c)),
-      ],
     );
   }
 }

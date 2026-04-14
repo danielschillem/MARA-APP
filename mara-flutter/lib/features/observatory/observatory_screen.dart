@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mara_flutter/core/services/api_service.dart';
 import 'package:mara_flutter/core/theme/app_theme.dart';
+import 'package:mara_flutter/shared/widgets/skeleton_loader.dart';
 
 class ObservatoryScreen extends StatefulWidget {
   const ObservatoryScreen({super.key});
@@ -186,8 +187,24 @@ class _ObservatoryScreenState extends State<ObservatoryScreen>
 
   Widget _buildStatsTab() {
     if (_loadingStats) {
-      return const Center(
-          child: CircularProgressIndicator(color: AppColors.primary));
+      return SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            Row(children: const [
+              Expanded(child: SkeletonStatCard()),
+              SizedBox(width: 12),
+              Expanded(child: SkeletonStatCard()),
+            ]),
+            const SizedBox(height: 12),
+            Row(children: const [
+              Expanded(child: SkeletonStatCard()),
+              SizedBox(width: 12),
+              Expanded(child: SkeletonStatCard()),
+            ]),
+          ],
+        ),
+      );
     }
     if (_stats == null) {
       return Center(
@@ -351,8 +368,7 @@ class _ObservatoryScreenState extends State<ObservatoryScreen>
         ),
         Expanded(
           child: _loadingReports
-              ? const Center(
-                  child: CircularProgressIndicator(color: AppColors.primary))
+              ? const SkeletonList(count: 5)
               : items.isEmpty
                   ? const Center(
                       child: Text('Aucun rapport disponible.',

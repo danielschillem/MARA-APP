@@ -86,13 +86,20 @@ class _WideLayout extends StatelessWidget {
 class _AppHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final hour = DateTime.now().hour;
+    final greeting = hour < 12
+        ? 'Bonjour'
+        : hour < 18
+            ? 'Bon après-midi'
+            : 'Bonsoir';
+
     return Material(
       color: AppColors.surface,
       elevation: 0,
       child: SafeArea(
         bottom: false,
         child: Container(
-          height: 52,
+          height: 68,
           padding: const EdgeInsets.symmetric(horizontal: 20),
           decoration: const BoxDecoration(
             border: Border(
@@ -101,76 +108,60 @@ class _AppHeader extends StatelessWidget {
           ),
           child: Row(
             children: [
+              // Brand avatar
               Container(
-                width: 30,
-                height: 30,
+                width: 44,
+                height: 44,
                 decoration: BoxDecoration(
                   gradient: const LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [Color(0xFFC8143E), Color(0xFF8C0C2A)],
                   ),
-                  borderRadius: BorderRadius.circular(9),
+                  borderRadius: BorderRadius.circular(14),
                   boxShadow: const [
                     BoxShadow(
-                      color: Color(0x30B5103C),
-                      blurRadius: 8,
-                      offset: Offset(0, 2),
+                      color: Color(0x28B5103C),
+                      blurRadius: 10,
+                      offset: Offset(0, 3),
                     ),
                   ],
                 ),
                 child: const Icon(Icons.shield_rounded,
-                    color: Colors.white, size: 16),
+                    color: Colors.white, size: 22),
               ),
-              const SizedBox(width: 10),
-              RichText(
-                text: const TextSpan(
+              const SizedBox(width: 12),
+              // Greeting
+              Expanded(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    TextSpan(
-                      text: 'VEILLE',
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w900,
-                        color: AppColors.primary,
-                        letterSpacing: 0.5,
-                      ),
-                    ),
-                    TextSpan(
-                      text: 'PROTECT',
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w900,
-                        color: AppColors.accent,
-                        letterSpacing: 0.5,
-                      ),
-                    ),
+                    Text(greeting,
+                        style: const TextStyle(
+                            fontSize: 11,
+                            color: AppColors.muted,
+                            fontWeight: FontWeight.w500)),
+                    const Text('VeilleProtect',
+                        style: TextStyle(
+                            fontSize: 17,
+                            fontWeight: FontWeight.w800,
+                            color: AppColors.title,
+                            letterSpacing: -0.3)),
                   ],
                 ),
               ),
-              const SizedBox(width: 8),
+              // Notification bell
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                width: 40,
+                height: 40,
                 decoration: BoxDecoration(
-                  color: AppColors.bgAlt,
-                  borderRadius: BorderRadius.circular(6),
+                  color: AppColors.bg,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: AppColors.borderLight),
                 ),
-                child: const Text(
-                  'CITOYEN',
-                  style: TextStyle(
-                    fontSize: 9,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 0.8,
-                    color: AppColors.muted,
-                  ),
-                ),
-              ),
-              const Spacer(),
-              IconButton(
-                icon: const Icon(Icons.more_vert_rounded, size: 20),
-                onPressed: () {},
-                color: AppColors.sub,
-                padding: EdgeInsets.zero,
-                constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+                child: const Icon(Icons.notifications_none_rounded,
+                    size: 20, color: AppColors.sub),
               ),
             ],
           ),
@@ -227,27 +218,28 @@ class _NavItem extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+            duration: const Duration(milliseconds: 220),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
             decoration: BoxDecoration(
-              color: isActive ? AppColors.primarySurface : Colors.transparent,
-              borderRadius: BorderRadius.circular(20),
+              color: isActive ? AppColors.primary : Colors.transparent,
+              borderRadius: BorderRadius.circular(24),
             ),
             child: Icon(
               isActive ? tab.activeIcon : tab.icon,
               size: 20,
-              color: isActive ? AppColors.primary : AppColors.muted,
+              color: isActive ? Colors.white : AppColors.muted,
             ),
           ),
           const SizedBox(height: 2),
-          Text(
-            tab.label,
+          AnimatedDefaultTextStyle(
+            duration: const Duration(milliseconds: 220),
             style: TextStyle(
               fontSize: 9,
               fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
               color: isActive ? AppColors.primary : AppColors.muted,
               letterSpacing: 0.1,
             ),
+            child: Text(tab.label),
           ),
         ],
       ),

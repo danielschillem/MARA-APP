@@ -465,14 +465,21 @@ class _ProgressBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: List.generate(
-        total,
-        (i) => Expanded(
-          child: Container(
-            margin: EdgeInsets.only(left: i == 0 ? 0 : 2),
-            height: 4,
-            color: i <= current ? AppColors.primary : AppColors.borderLight,
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 1),
+      child: Row(
+        children: List.generate(
+          total,
+          (i) => Expanded(
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
+              margin: EdgeInsets.only(left: i == 0 ? 0 : 4),
+              height: 4,
+              decoration: BoxDecoration(
+                color: i <= current ? AppColors.primary : AppColors.borderLight,
+                borderRadius: BorderRadius.circular(4),
+              ),
+            ),
           ),
         ),
       ),

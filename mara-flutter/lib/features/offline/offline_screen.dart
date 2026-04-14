@@ -234,84 +234,71 @@ class _QueueItem extends StatelessWidget {
     final queuedAt = item['queued_at'] ?? '';
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 9),
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: AppColors.surface,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppColors.borderLight),
-        boxShadow: AppShadows.sm,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: AppShadows.card,
       ),
-      child: IntrinsicHeight(
-        child: Row(
-          children: [
-            // Left accent bar
-            Container(
-              width: 4,
-              decoration: BoxDecoration(
-                color: AppColors.warning,
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(14),
-                  bottomLeft: Radius.circular(14),
-                ),
-              ),
+      child: Row(
+        children: [
+          // Icon badge
+          Container(
+            width: 50,
+            height: 50,
+            decoration: BoxDecoration(
+              color: AppColors.warningLight,
+              borderRadius: BorderRadius.circular(14),
             ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(12),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 36,
-                      height: 36,
-                      decoration: BoxDecoration(
-                          color: AppColors.warningLight,
-                          borderRadius: BorderRadius.circular(10)),
-                      child: const Icon(Icons.schedule_rounded,
-                          color: AppColors.warning, size: 18),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            '$typeId · $victimType',
-                            style: const TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w700,
-                                color: AppColors.ink),
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            '${zone.isNotEmpty ? zone : 'GPS'} · ${queuedAt.length >= 10 ? queuedAt.substring(0, 10) : queuedAt}',
-                            style: const TextStyle(
-                                fontSize: 11, color: AppColors.muted),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 3),
-                      decoration: BoxDecoration(
-                        color: AppColors.warningLight,
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(
-                            color: AppColors.warning.withValues(alpha: 0.3)),
-                      ),
-                      child: const Text('En attente',
-                          style: TextStyle(
-                              fontSize: 9,
-                              fontWeight: FontWeight.w800,
-                              letterSpacing: 0.3,
-                              color: AppColors.warning)),
-                    ),
-                  ],
+            child: const Icon(Icons.schedule_rounded,
+                color: AppColors.warning, size: 24),
+          ),
+          const SizedBox(width: 12),
+          // Info
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Alerte #$index · $typeId',
+                  style: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.ink),
                 ),
-              ),
+                const SizedBox(height: 3),
+                Text(
+                  '${zone.isNotEmpty ? zone : 'GPS'} · victime: $victimType',
+                  style: const TextStyle(fontSize: 11, color: AppColors.muted),
+                ),
+                if (queuedAt.isNotEmpty) ...[
+                  const SizedBox(height: 2),
+                  Text(
+                    queuedAt.length >= 10 ? queuedAt.substring(0, 10) : queuedAt,
+                    style: const TextStyle(fontSize: 10, color: AppColors.placeholder),
+                  ),
+                ],
+              ],
             ),
-          ],
-        ),
+          ),
+          // Badge
+          Container(
+            padding:
+                const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+            decoration: BoxDecoration(
+              color: AppColors.warningLight,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: const Text(
+              'En attente',
+              style: TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.warning),
+            ),
+          ),
+        ],
       ),
     );
   }

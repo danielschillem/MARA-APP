@@ -149,7 +149,7 @@ class _SosScreenState extends State<SosScreen> with TickerProviderStateMixin {
                   hasScrollBody: false,
                   child: Column(
                     children: [
-                      _buildGreeting(),
+                      _buildCategoryChips(context),
                       if (!_isOnline) _buildOfflineBanner(),
                       Expanded(
                         child:
@@ -168,61 +168,43 @@ class _SosScreenState extends State<SosScreen> with TickerProviderStateMixin {
     );
   }
 
-  // ── Header / Greeting ─────────────────────────────────────────────────────
+  // ── Category chips (Doctor App style) ─────────────────────────────────────
 
-  Widget _buildGreeting() {
-    return Container(
-      margin: const EdgeInsets.fromLTRB(16, 12, 16, 8),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: AppShadows.sm,
-        border: Border.all(color: AppColors.borderLight),
-      ),
+  Widget _buildCategoryChips(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
       child: Row(
         children: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xFF1D61B0), Color(0xFF1A2E4A)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child:
-                const Icon(Icons.shield_rounded, color: Colors.white, size: 20),
+          _ChipItem(
+            label: 'Signaler',
+            icon: Icons.description_rounded,
+            bgColor: AppColors.infoLight,
+            iconColor: AppColors.info,
+            onTap: () => context.go('/report'),
           ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text('VeilleProtect · Urgence',
-                    style: TextStyle(
-                        fontSize: 11,
-                        color: AppColors.muted,
-                        letterSpacing: 0.2)),
-                const Text('Êtes-vous en sécurité ?',
-                    style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.title)),
-              ],
-            ),
+          const SizedBox(width: 8),
+          _ChipItem(
+            label: 'Soutien',
+            icon: Icons.forum_rounded,
+            bgColor: AppColors.successLight,
+            iconColor: AppColors.success,
+            onTap: () => context.go('/chat'),
           ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              _StatusDot(
-                  on: _isOnline, label: _isOnline ? 'En ligne' : 'Hors-ligne'),
-              const SizedBox(height: 4),
-              const _StatusDot(
-                  on: true, label: 'GPS actif', color: AppColors.info),
-            ],
+          const SizedBox(width: 8),
+          _ChipItem(
+            label: 'Carte',
+            icon: Icons.location_on_rounded,
+            bgColor: AppColors.warningLight,
+            iconColor: AppColors.warning,
+            onTap: () => context.go('/map'),
+          ),
+          const SizedBox(width: 8),
+          _ChipItem(
+            label: 'USSD',
+            icon: Icons.dialpad_rounded,
+            bgColor: AppColors.purpleLight,
+            iconColor: AppColors.purple,
+            onTap: () => context.go('/ussd'),
           ),
         ],
       ),
@@ -597,6 +579,64 @@ class _SosScreenState extends State<SosScreen> with TickerProviderStateMixin {
                   fontSize: 10, color: AppColors.muted, letterSpacing: 0.1),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+// ── Category chip item (Doctor App style) ────────────────────────────────────
+class _ChipItem extends StatelessWidget {
+  final String label;
+  final IconData icon;
+  final Color bgColor;
+  final Color iconColor;
+  final VoidCallback onTap;
+
+  const _ChipItem({
+    required this.label,
+    required this.icon,
+    required this.bgColor,
+    required this.iconColor,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          height: 78,
+          decoration: BoxDecoration(
+            color: AppColors.surface,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: AppShadows.card,
+            border: Border.all(color: AppColors.borderLight),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                width: 38,
+                height: 38,
+                decoration: BoxDecoration(
+                  color: bgColor,
+                  borderRadius: BorderRadius.circular(11),
+                ),
+                child: Icon(icon, color: iconColor, size: 18),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                label,
+                style: const TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.sub,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

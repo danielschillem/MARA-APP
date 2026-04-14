@@ -63,7 +63,14 @@ func main() {
 	r.Use(chimw.RequestID)
 	r.Use(authmw.SecureHeaders)
 	r.Use(cors.Handler(cors.Options{
-		AllowedOrigins:   []string{cfg.FrontendURL, cfg.FlutterURL, "http://localhost:*", "http://127.0.0.1:*"},
+		AllowedOrigins: []string{
+			cfg.FrontendURL,
+			cfg.FlutterURL,
+			"http://localhost:*",
+			"http://127.0.0.1:*",
+			"https://*.netlify.app",
+			"https://mara-app-production.netlify.app",
+		},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-Request-ID"},
 		AllowCredentials: true,

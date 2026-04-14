@@ -8,6 +8,13 @@ import 'package:mara_flutter/features/report/report_screen.dart';
 import 'package:mara_flutter/features/map/map_screen.dart';
 import 'package:mara_flutter/features/offline/offline_screen.dart';
 import 'package:mara_flutter/features/ussd/ussd_screen.dart';
+import 'package:mara_flutter/features/resources/resources_screen.dart';
+import 'package:mara_flutter/features/track/track_screen.dart';
+import 'package:mara_flutter/features/services/services_screen.dart';
+import 'package:mara_flutter/features/profile/profile_screen.dart';
+import 'package:mara_flutter/features/notifications/notifications_screen.dart';
+import 'package:mara_flutter/features/counselor/counselor_dashboard.dart';
+import 'package:mara_flutter/features/observatory/observatory_screen.dart';
 import 'package:mara_flutter/app_shell.dart';
 
 final router = GoRouter(
@@ -23,6 +30,17 @@ final router = GoRouter(
   routes: [
     GoRoute(path: '/login', builder: (_, __) => const LoginScreen()),
     GoRoute(path: '/register', builder: (_, __) => const RegisterScreen()),
+    // Standalone screens (no shell / bottom nav)
+    GoRoute(path: '/resources', builder: (_, __) => const ResourcesScreen()),
+    GoRoute(path: '/track', builder: (_, __) => const TrackScreen()),
+    GoRoute(path: '/services', builder: (_, __) => const ServicesScreen()),
+    GoRoute(path: '/profile', builder: (_, __) => const ProfileScreen()),
+    GoRoute(
+        path: '/notifications',
+        builder: (_, __) => const NotificationsScreen()),
+    GoRoute(path: '/counselor', builder: (_, __) => const CounselorDashboard()),
+    GoRoute(
+        path: '/observatory', builder: (_, __) => const ObservatoryScreen()),
     ShellRoute(
       builder: (context, state, child) => AppShell(child: child),
       routes: [

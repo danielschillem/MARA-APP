@@ -72,7 +72,8 @@ class _TrackScreenState extends State<TrackScreen> {
                     if (_loading)
                       const Padding(
                         padding: EdgeInsets.only(top: 40),
-                        child: CircularProgressIndicator(color: AppColors.primary),
+                        child:
+                            CircularProgressIndicator(color: AppColors.primary),
                       ),
                     if (_error != null) _buildError(),
                     if (_result != null) _buildResult(),
@@ -275,8 +276,8 @@ class _TrackScreenState extends State<TrackScreen> {
                 Container(
                   width: 8,
                   height: 8,
-                  decoration: BoxDecoration(
-                      color: statusColor, shape: BoxShape.circle),
+                  decoration:
+                      BoxDecoration(color: statusColor, shape: BoxShape.circle),
                 ),
                 const SizedBox(width: 10),
                 Text(statusLabel,
@@ -286,8 +287,8 @@ class _TrackScreenState extends State<TrackScreen> {
                         color: statusColor)),
                 const Spacer(),
                 Container(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 10, vertical: 4),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
                     color: statusColor.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(8),
@@ -378,8 +379,7 @@ class _TrackScreenState extends State<TrackScreen> {
                       shape: BoxShape.circle,
                     ),
                     child: Icon(step.$3,
-                        size: 14,
-                        color: done ? Colors.white : AppColors.muted),
+                        size: 14, color: done ? Colors.white : AppColors.muted),
                   ),
                   if (idx < steps.length - 1)
                     Container(
@@ -393,8 +393,7 @@ class _TrackScreenState extends State<TrackScreen> {
                   step.$1,
                   style: TextStyle(
                       fontSize: 13,
-                      fontWeight:
-                          current ? FontWeight.w700 : FontWeight.w500,
+                      fontWeight: current ? FontWeight.w700 : FontWeight.w500,
                       color: done ? AppColors.title : AppColors.muted),
                 ),
               ),

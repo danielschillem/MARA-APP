@@ -197,8 +197,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             const SizedBox(height: 4),
             Text(email,
                 style: TextStyle(
-                    fontSize: 13,
-                    color: Colors.white.withValues(alpha: 0.6))),
+                    fontSize: 13, color: Colors.white.withValues(alpha: 0.6))),
           ],
           const SizedBox(height: 10),
           Container(
@@ -206,8 +205,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
             decoration: BoxDecoration(
               color: AppColors.primary.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                  color: AppColors.primary.withValues(alpha: 0.4)),
+              border:
+                  Border.all(color: AppColors.primary.withValues(alpha: 0.4)),
             ),
             child: Text(
               _roleLabel(role),
@@ -253,7 +252,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget _buildMenuSection(BuildContext context) {
     final isLoggedIn = AuthService.instance.isLoggedIn;
     final role = _user?['role'] as String? ?? 'citoyen';
-    final isPro = role == 'admin' || role == 'conseiller' || role == 'professionnel';
+    final isPro =
+        role == 'admin' || role == 'conseiller' || role == 'professionnel';
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -338,8 +338,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
           foregroundColor: AppColors.danger,
           side: const BorderSide(color: AppColors.danger),
           padding: const EdgeInsets.symmetric(vertical: 14),
-          shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(14)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
         ),
       ),
     );

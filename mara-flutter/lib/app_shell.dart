@@ -152,16 +152,36 @@ class _AppHeader extends StatelessWidget {
                 ),
               ),
               // Notification bell
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: AppColors.bg,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: AppColors.borderLight),
+              GestureDetector(
+                onTap: () => context.push('/notifications'),
+                child: Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: AppColors.bg,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: AppColors.borderLight),
+                  ),
+                  child: const Icon(Icons.notifications_none_rounded,
+                      size: 20, color: AppColors.sub),
                 ),
-                child: const Icon(Icons.notifications_none_rounded,
-                    size: 20, color: AppColors.sub),
+              ),
+              const SizedBox(width: 8),
+              // Profile avatar
+              GestureDetector(
+                onTap: () => context.push('/profile'),
+                child: Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: AppColors.primarySurface,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                        color: AppColors.primary.withValues(alpha: 0.3)),
+                  ),
+                  child: const Icon(Icons.person_rounded,
+                      size: 20, color: AppColors.primary),
+                ),
               ),
             ],
           ),
@@ -311,6 +331,47 @@ class _SideRail extends StatelessWidget {
               ),
             );
           }),
+          const Spacer(),
+          const Divider(indent: 12, endIndent: 12),
+          // Notifications
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 3),
+            child: Tooltip(
+              message: 'Annonces',
+              child: GestureDetector(
+                onTap: () => context.push('/notifications'),
+                child: Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Icon(Icons.notifications_none_rounded,
+                      size: 22, color: AppColors.muted),
+                ),
+              ),
+            ),
+          ),
+          // Profile
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 3),
+            child: Tooltip(
+              message: 'Profil',
+              child: GestureDetector(
+                onTap: () => context.push('/profile'),
+                child: Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Icon(Icons.person_rounded,
+                      size: 22, color: AppColors.muted),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 4),
         ],
       ),
     );

@@ -57,7 +57,8 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
             Expanded(
               child: _loading
                   ? const Center(
-                      child: CircularProgressIndicator(color: AppColors.primary))
+                      child:
+                          CircularProgressIndicator(color: AppColors.primary))
                   : _resources.isEmpty
                       ? _buildEmpty()
                       : RefreshIndicator(
@@ -148,8 +149,7 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
                 children: [
                   Icon(cat.$3,
                       size: 14,
-                      color:
-                          isSelected ? Colors.white : AppColors.muted),
+                      color: isSelected ? Colors.white : AppColors.muted),
                   const SizedBox(width: 6),
                   Text(cat.$2,
                       style: TextStyle(
@@ -170,8 +170,7 @@ class _ResourcesScreenState extends State<ResourcesScreen> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.library_books_rounded,
-              size: 56, color: AppColors.border),
+          Icon(Icons.library_books_rounded, size: 56, color: AppColors.border),
           const SizedBox(height: 16),
           const Text('Aucune ressource disponible',
               style: TextStyle(
@@ -232,8 +231,8 @@ class _ResourceCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final type = resource['category'] as String?;
     final title = resource['title'] as String? ?? 'Sans titre';
-    final summary = resource['summary'] as String? ??
-        resource['content'] as String? ?? '';
+    final summary =
+        resource['summary'] as String? ?? resource['content'] as String? ?? '';
     final id = resource['id'] as int?;
     final icon = _iconForType(type);
     final color = _colorForType(type);
@@ -261,8 +260,8 @@ class _ResourceCard extends StatelessWidget {
             Container(
               width: 48,
               height: 48,
-              decoration:
-                  BoxDecoration(color: bg, borderRadius: BorderRadius.circular(14)),
+              decoration: BoxDecoration(
+                  color: bg, borderRadius: BorderRadius.circular(14)),
               child: Icon(icon, color: color, size: 22),
             ),
             const SizedBox(width: 14),
@@ -403,7 +402,8 @@ class _ResourceDetailScreenState extends State<ResourceDetailScreen> {
             Expanded(
               child: _loading
                   ? const Center(
-                      child: CircularProgressIndicator(color: AppColors.primary))
+                      child:
+                          CircularProgressIndicator(color: AppColors.primary))
                   : _resource == null
                       ? const Center(
                           child: Text('Ressource introuvable.',
@@ -465,10 +465,8 @@ class _ResourceDetailScreenState extends State<ResourceDetailScreen> {
         const SizedBox(height: 16),
         Text(
           content,
-          style: const TextStyle(
-              fontSize: 15,
-              color: AppColors.body,
-              height: 1.7),
+          style:
+              const TextStyle(fontSize: 15, color: AppColors.body, height: 1.7),
         ),
         if (source != null && source.isNotEmpty) ...[
           const SizedBox(height: 24),

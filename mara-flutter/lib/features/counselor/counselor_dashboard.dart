@@ -139,8 +139,8 @@ class _CounselorDashboardState extends State<CounselorDashboard>
                         color: AppColors.title,
                         letterSpacing: -0.3)),
                 Text('Bonjour, $name',
-                    style: const TextStyle(
-                        fontSize: 12, color: AppColors.muted)),
+                    style:
+                        const TextStyle(fontSize: 12, color: AppColors.muted)),
               ],
             ),
           ),
@@ -152,8 +152,8 @@ class _CounselorDashboardState extends State<CounselorDashboard>
               decoration: BoxDecoration(
                 color: AppColors.primarySurface,
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                    color: AppColors.primary.withValues(alpha: 0.3)),
+                border:
+                    Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
               ),
               child: const Icon(Icons.person_rounded,
                   size: 20, color: AppColors.primary),
@@ -173,8 +173,7 @@ class _CounselorDashboardState extends State<CounselorDashboard>
         unselectedLabelColor: AppColors.muted,
         indicatorColor: AppColors.primary,
         indicatorWeight: 2.5,
-        labelStyle: const TextStyle(
-            fontSize: 13, fontWeight: FontWeight.w700),
+        labelStyle: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
         unselectedLabelStyle:
             const TextStyle(fontSize: 13, fontWeight: FontWeight.w500),
         tabs: const [
@@ -314,8 +313,8 @@ class _CounselorDashboardState extends State<CounselorDashboard>
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 200),
                     margin: const EdgeInsets.only(right: 8),
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 14, vertical: 6),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                     decoration: BoxDecoration(
                       color: _reportFilter == f.$1
                           ? AppColors.primary
@@ -341,8 +340,7 @@ class _CounselorDashboardState extends State<CounselorDashboard>
         Expanded(
           child: _loadingReports
               ? const Center(
-                  child:
-                      CircularProgressIndicator(color: AppColors.primary))
+                  child: CircularProgressIndicator(color: AppColors.primary))
               : _reports.isEmpty
                   ? const Center(
                       child: Text('Aucun signalement.',
@@ -353,8 +351,7 @@ class _CounselorDashboardState extends State<CounselorDashboard>
                       child: ListView.builder(
                         padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
                         itemCount: _reports.length,
-                        itemBuilder: (_, i) =>
-                            _ReportTile(report: _reports[i]),
+                        itemBuilder: (_, i) => _ReportTile(report: _reports[i]),
                       ),
                     ),
         ),
@@ -430,8 +427,8 @@ class _StatCard extends StatelessWidget {
                         fontWeight: FontWeight.w800,
                         color: color)),
                 Text(label,
-                    style: const TextStyle(
-                        fontSize: 11, color: AppColors.muted)),
+                    style:
+                        const TextStyle(fontSize: 11, color: AppColors.muted)),
               ],
             ),
           ),
@@ -465,7 +462,8 @@ class _ReportTile extends StatelessWidget {
     final type = report['type_id'] as String? ?? '';
     final status = report['status'] as String?;
     final createdAt = (report['created_at'] as String? ?? '');
-    final date = createdAt.length >= 10 ? createdAt.substring(0, 10) : createdAt;
+    final date =
+        createdAt.length >= 10 ? createdAt.substring(0, 10) : createdAt;
     final (color, bg) = _statusColor(status);
 
     return Container(
@@ -499,8 +497,8 @@ class _ReportTile extends StatelessWidget {
                         color: AppColors.title)),
                 const SizedBox(height: 2),
                 Text(type,
-                    style: const TextStyle(
-                        fontSize: 11, color: AppColors.muted)),
+                    style:
+                        const TextStyle(fontSize: 11, color: AppColors.muted)),
               ],
             ),
           ),
@@ -508,8 +506,7 @@ class _ReportTile extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 8, vertical: 3),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
                     color: bg, borderRadius: BorderRadius.circular(8)),
                 child: Text(status ?? 'pending',
@@ -520,8 +517,7 @@ class _ReportTile extends StatelessWidget {
               ),
               const SizedBox(height: 4),
               Text(date,
-                  style: const TextStyle(
-                      fontSize: 10, color: AppColors.muted)),
+                  style: const TextStyle(fontSize: 10, color: AppColors.muted)),
             ],
           ),
         ],
@@ -540,7 +536,8 @@ class _ConvTile extends StatelessWidget {
     final id = conv['id'];
     final status = conv['status'] as String? ?? 'open';
     final createdAt = (conv['created_at'] as String? ?? '');
-    final date = createdAt.length >= 10 ? createdAt.substring(0, 10) : createdAt;
+    final date =
+        createdAt.length >= 10 ? createdAt.substring(0, 10) : createdAt;
     final isOpen = status == 'open';
 
     return Container(
@@ -562,8 +559,7 @@ class _ConvTile extends StatelessWidget {
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(Icons.forum_rounded,
-                color: isOpen ? AppColors.success : AppColors.muted,
-                size: 20),
+                color: isOpen ? AppColors.success : AppColors.muted, size: 20),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -577,14 +573,13 @@ class _ConvTile extends StatelessWidget {
                         color: AppColors.title)),
                 const SizedBox(height: 2),
                 Text(date,
-                    style: const TextStyle(
-                        fontSize: 11, color: AppColors.muted)),
+                    style:
+                        const TextStyle(fontSize: 11, color: AppColors.muted)),
               ],
             ),
           ),
           Container(
-            padding: const EdgeInsets.symmetric(
-                horizontal: 8, vertical: 3),
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
             decoration: BoxDecoration(
               color: isOpen ? AppColors.successLight : AppColors.bgAlt,
               borderRadius: BorderRadius.circular(8),

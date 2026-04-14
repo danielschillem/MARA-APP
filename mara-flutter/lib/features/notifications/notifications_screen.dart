@@ -52,8 +52,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                           color: AppColors.primary,
                           onRefresh: _load,
                           child: ListView.builder(
-                            padding:
-                                const EdgeInsets.fromLTRB(16, 0, 16, 24),
+                            padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
                             itemCount: _announcements.length,
                             itemBuilder: (_, i) => _AnnouncementCard(
                                 announcement: _announcements[i]),
@@ -137,11 +136,13 @@ class _AnnouncementCard extends StatelessWidget {
       case 'urgent':
         return (AppColors.danger, AppColors.dangerLight, Icons.warning_rounded);
       case 'important':
-        return (AppColors.warning, AppColors.warningLight,
-            Icons.info_outline_rounded);
+        return (
+          AppColors.warning,
+          AppColors.warningLight,
+          Icons.info_outline_rounded
+        );
       default:
-        return (AppColors.info, AppColors.infoLight,
-            Icons.campaign_rounded);
+        return (AppColors.info, AppColors.infoLight, Icons.campaign_rounded);
     }
   }
 
@@ -191,8 +192,8 @@ class _AnnouncementCard extends StatelessWidget {
                 ),
                 const Spacer(),
                 Text(dateLabel,
-                    style: const TextStyle(
-                        fontSize: 10, color: AppColors.muted)),
+                    style:
+                        const TextStyle(fontSize: 10, color: AppColors.muted)),
               ],
             ),
           ),
@@ -213,9 +214,7 @@ class _AnnouncementCard extends StatelessWidget {
                 if (body.isNotEmpty)
                   Text(body,
                       style: const TextStyle(
-                          fontSize: 13,
-                          color: AppColors.body,
-                          height: 1.5)),
+                          fontSize: 13, color: AppColors.body, height: 1.5)),
               ],
             ),
           ),

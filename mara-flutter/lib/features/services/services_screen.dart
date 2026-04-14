@@ -71,15 +71,15 @@ class _ServicesScreenState extends State<ServicesScreen> {
             Expanded(
               child: _loading
                   ? const Center(
-                      child: CircularProgressIndicator(color: AppColors.primary))
+                      child:
+                          CircularProgressIndicator(color: AppColors.primary))
                   : _filtered.isEmpty
                       ? _buildEmpty()
                       : RefreshIndicator(
                           color: AppColors.primary,
                           onRefresh: _load,
                           child: ListView.builder(
-                            padding:
-                                const EdgeInsets.fromLTRB(16, 0, 16, 24),
+                            padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
                             itemCount: _filtered.length,
                             itemBuilder: (_, i) =>
                                 _ServiceCard(service: _filtered[i]),
@@ -141,7 +141,8 @@ class _ServicesScreenState extends State<ServicesScreen> {
         style: const TextStyle(fontSize: 14, color: AppColors.title),
         decoration: InputDecoration(
           hintText: 'Chercher un service, une ville…',
-          hintStyle: const TextStyle(fontSize: 13, color: AppColors.placeholder),
+          hintStyle:
+              const TextStyle(fontSize: 13, color: AppColors.placeholder),
           prefixIcon: const Icon(Icons.search_rounded,
               size: 20, color: AppColors.muted),
           filled: true,
@@ -158,8 +159,7 @@ class _ServicesScreenState extends State<ServicesScreen> {
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(14),
-            borderSide:
-                const BorderSide(color: AppColors.primary, width: 1.5),
+            borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
           ),
         ),
       ),
@@ -200,8 +200,7 @@ class _ServicesScreenState extends State<ServicesScreen> {
                       style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
-                          color:
-                              isSelected ? Colors.white : AppColors.sub)),
+                          color: isSelected ? Colors.white : AppColors.sub)),
                 ],
               ),
             ),
@@ -241,13 +240,29 @@ class _ServiceCard extends StatelessWidget {
   (IconData, Color, Color) _typeInfo(String? type) {
     switch (type) {
       case 'police':
-        return (Icons.local_police_rounded, AppColors.accent, AppColors.accentLight);
+        return (
+          Icons.local_police_rounded,
+          AppColors.accent,
+          AppColors.accentLight
+        );
       case 'health':
-        return (Icons.local_hospital_rounded, AppColors.success, AppColors.successLight);
+        return (
+          Icons.local_hospital_rounded,
+          AppColors.success,
+          AppColors.successLight
+        );
       case 'legal':
-        return (Icons.balance_rounded, AppColors.warning, AppColors.warningLight);
+        return (
+          Icons.balance_rounded,
+          AppColors.warning,
+          AppColors.warningLight
+        );
       default:
-        return (Icons.volunteer_activism_rounded, AppColors.primary, AppColors.primarySurface);
+        return (
+          Icons.volunteer_activism_rounded,
+          AppColors.primary,
+          AppColors.primarySurface
+        );
     }
   }
 

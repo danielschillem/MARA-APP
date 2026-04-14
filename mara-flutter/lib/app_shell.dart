@@ -12,12 +12,14 @@ class _Tab {
 }
 
 const _tabs = [
-  _Tab('/',        'SOS',      Icons.warning_outlined,            Icons.warning_rounded),
-  _Tab('/report',  'Signaler', Icons.edit_note_outlined,          Icons.edit_note_rounded),
-  _Tab('/chat',    'Chat',     Icons.chat_bubble_outline_rounded, Icons.chat_bubble_rounded),
-  _Tab('/map',     'Carte',    Icons.map_outlined,               Icons.map_rounded),
-  _Tab('/offline', 'Offline',  Icons.wifi_off_outlined,          Icons.wifi_off_rounded),
-  _Tab('/ussd',    'SMS',      Icons.smartphone_outlined,        Icons.smartphone_rounded),
+  _Tab('/', 'Urgence', Icons.emergency_outlined, Icons.emergency_rounded),
+  _Tab('/report', 'Signaler', Icons.description_outlined,
+      Icons.description_rounded),
+  _Tab('/chat', 'Soutien', Icons.forum_outlined, Icons.forum_rounded),
+  _Tab('/map', 'Carte', Icons.location_on_outlined, Icons.location_on_rounded),
+  _Tab('/offline', 'Hors-ligne', Icons.cloud_off_rounded,
+      Icons.cloud_off_rounded),
+  _Tab('/ussd', 'USSD', Icons.dialpad_outlined, Icons.dialpad_rounded),
 ];
 
 // ── Shell ─────────────────────────────────────────────────────────────────────
@@ -228,9 +230,7 @@ class _NavItem extends StatelessWidget {
             duration: const Duration(milliseconds: 200),
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
             decoration: BoxDecoration(
-              color: isActive
-                  ? AppColors.primarySurface
-                  : Colors.transparent,
+              color: isActive ? AppColors.primarySurface : Colors.transparent,
               borderRadius: BorderRadius.circular(20),
             ),
             child: Icon(
@@ -244,8 +244,7 @@ class _NavItem extends StatelessWidget {
             tab.label,
             style: TextStyle(
               fontSize: 9,
-              fontWeight:
-                  isActive ? FontWeight.w700 : FontWeight.w500,
+              fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
               color: isActive ? AppColors.primary : AppColors.muted,
               letterSpacing: 0.1,
             ),
@@ -283,7 +282,8 @@ class _SideRail extends StatelessWidget {
                 BoxShadow(color: Color(0x28B5103C), blurRadius: 10),
               ],
             ),
-            child: const Icon(Icons.shield_rounded, color: Colors.white, size: 20),
+            child:
+                const Icon(Icons.shield_rounded, color: Colors.white, size: 20),
           ),
           const SizedBox(height: 24),
           const Divider(indent: 12, endIndent: 12),
@@ -304,7 +304,9 @@ class _SideRail extends StatelessWidget {
                     width: 48,
                     height: 48,
                     decoration: BoxDecoration(
-                      color: active ? AppColors.primarySurface : Colors.transparent,
+                      color: active
+                          ? AppColors.primarySurface
+                          : Colors.transparent,
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Icon(

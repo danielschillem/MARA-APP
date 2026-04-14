@@ -60,36 +60,54 @@ class _OfflineScreenState extends State<OfflineScreen> {
     return Scaffold(
       body: SafeArea(
         child: ListView(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.all(16),
           children: [
             // Hero
             Container(
-              padding: const EdgeInsets.all(22),
+              padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFFD4601A), Color(0xFFA04010)],
-                ),
-                borderRadius: BorderRadius.circular(18),
+                color: AppColors.accent,
+                borderRadius: BorderRadius.circular(20),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
                     children: [
-                      const Icon(Icons.wifi_off, color: Colors.white70, size: 28),
-                      const SizedBox(width: 10),
-                      const Text('Mode hors-ligne actif',
-                          style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w700,
-                              color: Colors.white,
-                              fontFamily: 'Playfair Display')),
+                      Container(
+                        width: 44,
+                        height: 44,
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.15),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: const Icon(Icons.cloud_off_rounded,
+                            color: Colors.white, size: 22),
+                      ),
+                      const SizedBox(width: 12),
+                      const Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('Mode hors-ligne actif',
+                                style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w700,
+                                    color: Colors.white)),
+                            SizedBox(height: 2),
+                            Text('Alertes sauvegardées localement',
+                                style: TextStyle(
+                                    fontSize: 11, color: Colors.white70)),
+                          ],
+                        ),
+                      ),
                     ],
                   ),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 16),
                   const Text(
-                    'Vos alertes sont sauvegardées localement et seront synchronisées automatiquement dès le retour de la connexion.',
-                    style: TextStyle(fontSize: 12, color: Colors.white70, height: 1.6),
+                    'Vos alertes seront synchronisées automatiquement dès le retour de la connexion.',
+                    style: TextStyle(
+                        fontSize: 12, color: Colors.white70, height: 1.6),
                   ),
                   const SizedBox(height: 14),
                   Row(
@@ -111,9 +129,9 @@ class _OfflineScreenState extends State<OfflineScreen> {
 
             const Text('FILE D\'ATTENTE LOCALE',
                 style: TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 0.12,
+                    fontSize: 9,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 1.2,
                     color: AppColors.muted)),
             const SizedBox(height: 10),
 
@@ -142,15 +160,27 @@ class _OfflineScreenState extends State<OfflineScreen> {
             const SizedBox(height: 16),
             ElevatedButton.icon(
               onPressed: _syncing ? null : _sync,
-              icon: const Icon(Icons.sync, color: Colors.white),
-              label: Text(_syncing ? 'Synchronisation…' : 'Synchroniser maintenant',
-                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
+              icon: _syncing
+                  ? const SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(
+                          strokeWidth: 2, color: Colors.white),
+                    )
+                  : const Icon(Icons.cloud_sync_rounded,
+                      color: Colors.white, size: 18),
+              label: Text(
+                _syncing ? 'Synchronisation…' : 'Synchroniser maintenant',
+                style: const TextStyle(
+                    color: Colors.white, fontWeight: FontWeight.w700),
+              ),
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.orange,
+                backgroundColor: AppColors.primary,
                 padding: const EdgeInsets.symmetric(vertical: 14),
                 minimumSize: const Size(double.infinity, 48),
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(14)),
+                elevation: 0,
               ),
             ),
           ],
@@ -205,53 +235,83 @@ class _QueueItem extends StatelessWidget {
 
     return Container(
       margin: const EdgeInsets.only(bottom: 9),
-      padding: const EdgeInsets.all(13),
       decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border.all(color: AppColors.border, width: 1.5),
-        borderRadius: BorderRadius.circular(13),
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: AppColors.borderLight),
+        boxShadow: AppShadows.sm,
       ),
-      child: Row(
-        children: [
-          Container(
-            width: 36,
-            height: 36,
-            decoration: BoxDecoration(
-                color: AppColors.orangeLight,
-                borderRadius: BorderRadius.circular(9)),
-            child: const Icon(Icons.warning_rounded,
-                color: AppColors.orange, size: 18),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('$typeId · $victimType',
-                    style: const TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.ink)),
-                Text(
-                    '${zone.isNotEmpty ? zone : "GPS"} · ${queuedAt.substring(0, 10)}',
-                    style: const TextStyle(
-                        fontSize: 11, color: AppColors.muted)),
-              ],
+      child: IntrinsicHeight(
+        child: Row(
+          children: [
+            // Left accent bar
+            Container(
+              width: 4,
+              decoration: BoxDecoration(
+                color: AppColors.warning,
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(14),
+                  bottomLeft: Radius.circular(14),
+                ),
+              ),
             ),
-          ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-            decoration: BoxDecoration(
-              color: AppColors.orangeLight,
-              borderRadius: BorderRadius.circular(10),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 36,
+                      height: 36,
+                      decoration: BoxDecoration(
+                          color: AppColors.warningLight,
+                          borderRadius: BorderRadius.circular(10)),
+                      child: const Icon(Icons.schedule_rounded,
+                          color: AppColors.warning, size: 18),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '$typeId · $victimType',
+                            style: const TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.ink),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            '${zone.isNotEmpty ? zone : 'GPS'} · ${queuedAt.length >= 10 ? queuedAt.substring(0, 10) : queuedAt}',
+                            style: const TextStyle(
+                                fontSize: 11, color: AppColors.muted),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: AppColors.warningLight,
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(
+                            color: AppColors.warning.withValues(alpha: 0.3)),
+                      ),
+                      child: const Text('En attente',
+                          style: TextStyle(
+                              fontSize: 9,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: 0.3,
+                              color: AppColors.warning)),
+                    ),
+                  ],
+                ),
+              ),
             ),
-            child: const Text('En attente',
-                style: TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.orange)),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

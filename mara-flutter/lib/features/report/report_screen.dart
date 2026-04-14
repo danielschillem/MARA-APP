@@ -23,6 +23,13 @@ class _ReportScreenState extends State<ReportScreen> {
   bool _loading = false;
   String? _reference;
 
+  static const _stepLabels = [
+    'Votre identité',
+    'Type de violence',
+    'La victime',
+    'Détails',
+  ];
+
   @override
   void dispose() {
     _descCtrl.dispose();
@@ -66,17 +73,42 @@ class _ReportScreenState extends State<ReportScreen> {
     return Scaffold(
       appBar: _step < 4
           ? AppBar(
+              elevation: 0,
+              backgroundColor: AppColors.surface,
+              surfaceTintColor: Colors.transparent,
               leading: _step > 0
                   ? IconButton(
-                      icon: const Icon(Icons.arrow_back_ios, size: 18),
+                      icon: const Icon(Icons.arrow_back_rounded, size: 20),
                       onPressed: _prevStep,
                     )
                   : null,
-              title: const Text('Signaler'),
+              title: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text('Signalement',
+                      style:
+                          TextStyle(fontSize: 15, fontWeight: FontWeight.w700)),
+                  Text(_stepLabels[_step],
+                      style: const TextStyle(
+                          fontSize: 11, color: AppColors.muted)),
+                ],
+              ),
+              bottom: PreferredSize(
+                preferredSize: const Size.fromHeight(6),
+                child: _ProgressBar(current: _step, total: 4),
+              ),
               actions: [
                 Padding(
                   padding: const EdgeInsets.only(right: 16),
-                  child: _StepIndicator(current: _step, total: 4),
+                  child: Center(
+                    child: Text(
+                      '${_step + 1}/4',
+                      style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.primary),
+                    ),
+                  ),
                 ),
               ],
             )
@@ -101,22 +133,17 @@ class _ReportScreenState extends State<ReportScreen> {
     return ListView(
       padding: const EdgeInsets.all(20),
       children: [
-        const SizedBox(height: 8),
-        const Text('Votre identité',
-            style: TextStyle(
-                fontFamily: 'Playfair Display',
-                fontSize: 22,
-                fontWeight: FontWeight.w700)),
-        const SizedBox(height: 6),
+        const SizedBox(height: 4),
         const Text('Comment soumettre ce signalement ?',
             style: TextStyle(fontSize: 13, color: AppColors.sub)),
         const SizedBox(height: 20),
         _IdentityCard(
-          icon: Icons.visibility_off,
+          icon: Icons.visibility_off_rounded,
+          iconBg: const Color(0xFF2D6A4F),
           title: 'Anonyme total',
           desc: 'Aucune donnée vous identifiant n\'est transmise.',
           badge: 'Recommandé si risque personnel',
-          badgeColor: AppColors.green,
+          badgeColor: AppColors.success,
           selected: _identity == 'anonymous',
           onTap: () {
             setState(() => _identity = 'anonymous');
@@ -125,11 +152,12 @@ class _ReportScreenState extends State<ReportScreen> {
         ),
         const SizedBox(height: 10),
         _IdentityCard(
-          icon: Icons.remove_red_eye,
+          icon: Icons.badge_outlined,
+          iconBg: AppColors.accent,
           title: 'Avec un pseudonyme',
           desc: 'Recevez des mises à jour sans révéler votre identité.',
           badge: 'Suivi possible',
-          badgeColor: AppColors.navy,
+          badgeColor: AppColors.accent,
           selected: _identity == 'pseudo',
           onTap: () {
             setState(() => _identity = 'pseudo');
@@ -138,7 +166,8 @@ class _ReportScreenState extends State<ReportScreen> {
         ),
         const SizedBox(height: 10),
         _IdentityCard(
-          icon: Icons.person,
+          icon: Icons.person_rounded,
+          iconBg: AppColors.purple,
           title: 'Identifié(e)',
           desc: 'Un coordinateur peut vous contacter directement.',
           badge: 'Témoignage officiel',
@@ -158,25 +187,30 @@ class _ReportScreenState extends State<ReportScreen> {
     return ListView(
       padding: const EdgeInsets.all(20),
       children: [
-        const Text('Type de violence',
-            style: TextStyle(
-                fontFamily: 'Playfair Display',
-                fontSize: 22,
-                fontWeight: FontWeight.w700)),
-        const SizedBox(height: 6),
         const Text('Sélectionnez la nature des faits',
             style: TextStyle(fontSize: 13, color: AppColors.sub)),
         const SizedBox(height: 16),
-        ...kViolenceTypes.entries.map((e) => Padding(
-              padding: const EdgeInsets.only(bottom: 9),
-              child: _TypeItem(
-                id: e.key,
-                label: e.value['label']!,
-                sub: e.value['sub']!,
-                selected: _selectedType == e.key,
-                onTap: () => setState(() => _selectedType = e.key),
-              ),
-            )),
+        ...kViolenceTypes.entries.map((e) {
+          const typeIcons = <String, IconData>{
+            'physical': Icons.personal_injury_rounded,
+            'sexual': Icons.sentiment_very_dissatisfied_rounded,
+            'domestic': Icons.home_rounded,
+            'verbal': Icons.record_voice_over_rounded,
+            'psychological': Icons.psychology_rounded,
+            'economic': Icons.account_balance_wallet_rounded,
+          };
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 9),
+            child: _TypeItem(
+              id: e.key,
+              label: e.value['label']!,
+              sub: e.value['sub']!,
+              icon: typeIcons[e.key] ?? Icons.warning_rounded,
+              selected: _selectedType == e.key,
+              onTap: () => setState(() => _selectedType = e.key),
+            ),
+          );
+        }),
         const SizedBox(height: 16),
         AppButton(
           label: 'Continuer',
@@ -191,12 +225,6 @@ class _ReportScreenState extends State<ReportScreen> {
     return ListView(
       padding: const EdgeInsets.all(20),
       children: [
-        const Text('La victime',
-            style: TextStyle(
-                fontFamily: 'Playfair Display',
-                fontSize: 22,
-                fontWeight: FontWeight.w700)),
-        const SizedBox(height: 6),
         const Text('Qui semble être la personne concernée ?',
             style: TextStyle(fontSize: 13, color: AppColors.sub)),
         const SizedBox(height: 16),
@@ -206,14 +234,22 @@ class _ReportScreenState extends State<ReportScreen> {
           physics: const NeverScrollableScrollPhysics(),
           crossAxisSpacing: 11,
           mainAxisSpacing: 11,
-          children: kVictimTypes.entries
-              .map((e) => _VictimCard(
-                    id: e.key,
-                    label: e.value['label']!,
-                    selected: _selectedVictim == e.key,
-                    onTap: () => setState(() => _selectedVictim = e.key),
-                  ))
-              .toList(),
+          children: kVictimTypes.entries.map((e) {
+            const victimIcons = <String, IconData>{
+              'woman': Icons.woman_rounded,
+              'man': Icons.man_rounded,
+              'child': Icons.child_care_rounded,
+              'elderly': Icons.elderly_rounded,
+              'unknown': Icons.help_outline_rounded,
+            };
+            return _VictimCard(
+              id: e.key,
+              label: e.value['label']!,
+              icon: victimIcons[e.key] ?? Icons.person_rounded,
+              selected: _selectedVictim == e.key,
+              onTap: () => setState(() => _selectedVictim = e.key),
+            );
+          }).toList(),
         ),
         const SizedBox(height: 16),
         AppButton(
@@ -229,15 +265,9 @@ class _ReportScreenState extends State<ReportScreen> {
     return ListView(
       padding: const EdgeInsets.all(20),
       children: [
-        const Text('Enrichir le signalement',
-            style: TextStyle(
-                fontFamily: 'Playfair Display',
-                fontSize: 22,
-                fontWeight: FontWeight.w700)),
-        const SizedBox(height: 6),
         const Text('Informations optionnelles mais précieuses',
             style: TextStyle(fontSize: 13, color: AppColors.sub)),
-        const SizedBox(height: 16),
+        const SizedBox(height: 18),
         const Text('EST-CE EN COURS ?',
             style: TextStyle(
                 fontSize: 10,
@@ -392,12 +422,14 @@ class _ReportScreenState extends State<ReportScreen> {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Icon(Icons.info_outline, size: 13, color: AppColors.muted),
+                const Icon(Icons.info_outline,
+                    size: 13, color: AppColors.muted),
                 const SizedBox(width: 9),
                 const Expanded(
                   child: Text(
                     'En danger immédiat : 17 (Police) · 3919 (Violences Femmes) · 119 (Enfants)',
-                    style: TextStyle(fontSize: 12, color: AppColors.sub, height: 1.6),
+                    style: TextStyle(
+                        fontSize: 12, color: AppColors.sub, height: 1.6),
                   ),
                 ),
               ],
@@ -426,29 +458,31 @@ class _ReportScreenState extends State<ReportScreen> {
 
 // ─── Supporting widgets ────────────────────────────────────────────────────────
 
-class _StepIndicator extends StatelessWidget {
+class _ProgressBar extends StatelessWidget {
   final int current;
   final int total;
-  const _StepIndicator({required this.current, required this.total});
+  const _ProgressBar({required this.current, required this.total});
 
   @override
   Widget build(BuildContext context) {
     return Row(
-      children: List.generate(total, (i) => Container(
-            margin: const EdgeInsets.only(left: 5),
-            width: 22,
+      children: List.generate(
+        total,
+        (i) => Expanded(
+          child: Container(
+            margin: EdgeInsets.only(left: i == 0 ? 0 : 2),
             height: 4,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(2),
-              color: i <= current ? AppColors.red : AppColors.border,
-            ),
-          )),
+            color: i <= current ? AppColors.primary : AppColors.borderLight,
+          ),
+        ),
+      ),
     );
   }
 }
 
 class _IdentityCard extends StatelessWidget {
   final IconData icon;
+  final Color iconBg;
   final String title;
   final String desc;
   final String badge;
@@ -458,6 +492,7 @@ class _IdentityCard extends StatelessWidget {
 
   const _IdentityCard({
     required this.icon,
+    required this.iconBg,
     required this.title,
     required this.desc,
     required this.badge,
@@ -470,22 +505,25 @@ class _IdentityCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
-      child: Container(
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 150),
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: selected ? AppColors.primarySurface : AppColors.surface,
           border: Border.all(
-              color: selected ? AppColors.red : AppColors.border, width: 1.5),
+              color: selected ? AppColors.primary : AppColors.border,
+              width: selected ? 2 : 1.5),
           borderRadius: BorderRadius.circular(16),
+          boxShadow: selected ? AppShadows.sm : [],
         ),
         child: Row(
           children: [
             Container(
-              width: 40,
-              height: 40,
+              width: 44,
+              height: 44,
               decoration: BoxDecoration(
-                  color: AppColors.redLight, borderRadius: BorderRadius.circular(11)),
-              child: Icon(icon, color: AppColors.red, size: 20),
+                  color: iconBg, borderRadius: BorderRadius.circular(12)),
+              child: Icon(icon, color: Colors.white, size: 22),
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -493,32 +531,39 @@ class _IdentityCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(title,
-                      style: const TextStyle(
+                      style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w700,
-                          color: AppColors.ink)),
+                          color: selected ? AppColors.primary : AppColors.ink)),
                   const SizedBox(height: 3),
                   Text(desc,
-                      style: const TextStyle(fontSize: 11, color: AppColors.sub)),
-                  const SizedBox(height: 6),
+                      style: const TextStyle(
+                          fontSize: 11, color: AppColors.sub, height: 1.4)),
+                  const SizedBox(height: 7),
                   Container(
                     padding:
-                        const EdgeInsets.symmetric(horizontal: 9, vertical: 2),
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                     decoration: BoxDecoration(
-                      border: Border.all(color: badgeColor.withValues(alpha: 0.3)),
+                      border:
+                          Border.all(color: badgeColor.withValues(alpha: 0.3)),
                       borderRadius: BorderRadius.circular(20),
                       color: badgeColor.withValues(alpha: 0.08),
                     ),
                     child: Text(badge,
                         style: TextStyle(
-                            fontSize: 10,
+                            fontSize: 9,
                             fontWeight: FontWeight.w700,
+                            letterSpacing: 0.2,
                             color: badgeColor)),
                   ),
                 ],
               ),
             ),
-            const Icon(Icons.chevron_right, color: AppColors.muted, size: 14),
+            Icon(
+              selected ? Icons.check_circle_rounded : Icons.chevron_right,
+              color: selected ? AppColors.primary : AppColors.muted,
+              size: 20,
+            ),
           ],
         ),
       ),
@@ -530,15 +575,18 @@ class _TypeItem extends StatelessWidget {
   final String id;
   final String label;
   final String sub;
+  final IconData icon;
   final bool selected;
   final VoidCallback onTap;
 
-  const _TypeItem(
-      {required this.id,
-      required this.label,
-      required this.sub,
-      required this.selected,
-      required this.onTap});
+  const _TypeItem({
+    required this.id,
+    required this.label,
+    required this.sub,
+    required this.icon,
+    required this.selected,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -548,22 +596,22 @@ class _TypeItem extends StatelessWidget {
         duration: const Duration(milliseconds: 150),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         decoration: BoxDecoration(
-          color: selected ? AppColors.redLight : Colors.white,
+          color: selected ? AppColors.primarySurface : AppColors.surface,
           border: Border.all(
-              color: selected ? AppColors.red : AppColors.border, width: 1.5),
+              color: selected ? AppColors.primary : AppColors.border,
+              width: selected ? 2 : 1.5),
           borderRadius: BorderRadius.circular(13),
         ),
         child: Row(
           children: [
             Container(
-              width: 36,
-              height: 36,
+              width: 40,
+              height: 40,
               decoration: BoxDecoration(
-                  color: selected ? AppColors.red : const Color(0xFFF2F2EF),
-                  borderRadius: BorderRadius.circular(9)),
-              child: Icon(Icons.warning_rounded,
-                  size: 18,
-                  color: selected ? Colors.white : AppColors.muted),
+                  color: selected ? AppColors.primary : AppColors.bgAlt,
+                  borderRadius: BorderRadius.circular(11)),
+              child: Icon(icon,
+                  size: 20, color: selected ? Colors.white : AppColors.sub),
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -574,7 +622,7 @@ class _TypeItem extends StatelessWidget {
                       style: TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w700,
-                          color: selected ? AppColors.red : AppColors.ink)),
+                          color: selected ? AppColors.primary : AppColors.ink)),
                   Text(sub,
                       style: const TextStyle(
                           fontSize: 11, color: AppColors.muted)),
@@ -582,7 +630,8 @@ class _TypeItem extends StatelessWidget {
               ),
             ),
             if (selected)
-              const Icon(Icons.check_circle, color: AppColors.red, size: 18),
+              const Icon(Icons.check_circle_rounded,
+                  color: AppColors.primary, size: 20),
           ],
         ),
       ),
@@ -593,14 +642,17 @@ class _TypeItem extends StatelessWidget {
 class _VictimCard extends StatelessWidget {
   final String id;
   final String label;
+  final IconData icon;
   final bool selected;
   final VoidCallback onTap;
 
-  const _VictimCard(
-      {required this.id,
-      required this.label,
-      required this.selected,
-      required this.onTap});
+  const _VictimCard({
+    required this.id,
+    required this.label,
+    required this.icon,
+    required this.selected,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -608,34 +660,39 @@ class _VictimCard extends StatelessWidget {
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 150),
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: selected ? AppColors.redLight : const Color(0xFFFAFAFA),
+          color: selected ? AppColors.primarySurface : AppColors.surface,
           border: Border.all(
-              color: selected ? AppColors.red : AppColors.border, width: 1.5),
+              color: selected ? AppColors.primary : AppColors.border,
+              width: selected ? 2 : 1.5),
           borderRadius: BorderRadius.circular(15),
+          boxShadow: selected ? AppShadows.sm : [],
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              width: 50,
-              height: 50,
+              width: 52,
+              height: 52,
               decoration: BoxDecoration(
-                  color: selected ? AppColors.red : const Color(0xFFF0F0EC),
-                  borderRadius: BorderRadius.circular(14)),
-              child: Icon(Icons.person,
-                  size: 24,
-                  color: selected ? Colors.white : AppColors.muted),
+                  color: selected ? AppColors.primary : AppColors.bgAlt,
+                  borderRadius: BorderRadius.circular(16)),
+              child: Icon(icon,
+                  size: 26, color: selected ? Colors.white : AppColors.sub),
             ),
-            const SizedBox(height: 9),
+            const SizedBox(height: 10),
             Text(label,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
-                    color:
-                        selected ? AppColors.red : AppColors.sub)),
+                    color: selected ? AppColors.primary : AppColors.sub)),
+            if (selected) ...[
+              const SizedBox(height: 4),
+              const Icon(Icons.check_circle_rounded,
+                  color: AppColors.primary, size: 14),
+            ],
           ],
         ),
       ),
@@ -738,8 +795,7 @@ class _InfoCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 13),
       decoration: BoxDecoration(
-          color: AppColors.greenLight,
-          borderRadius: BorderRadius.circular(13)),
+          color: AppColors.greenLight, borderRadius: BorderRadius.circular(13)),
       child: Row(
         children: [
           const Icon(Icons.check_circle_outline,

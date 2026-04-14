@@ -140,9 +140,9 @@ Référence : VLP-${DateTime.now().millisecond.toString().padLeft(4, '0')}-${Dat
             // Simulator
             const Text('SIMULATEUR USSD',
                 style: TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 0.12,
+                    fontSize: 9,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 1.2,
                     color: AppColors.muted)),
             const SizedBox(height: 10),
             Container(
@@ -274,27 +274,27 @@ Référence : VLP-${DateTime.now().millisecond.toString().padLeft(4, '0')}-${Dat
             const SizedBox(height: 20),
 
             // SMS templates
-            const Text('MODÈLES SMS',
+            const Text('MODELES SMS',
                 style: TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 0.12,
+                    fontSize: 9,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 1.2,
                     color: AppColors.muted)),
             const SizedBox(height: 10),
             _SmsCard(
               title: 'Alerte urgente',
-              icon: Icons.warning_rounded,
-              iconColor: AppColors.red,
+              icon: Icons.emergency_rounded,
+              iconColor: AppColors.primary,
               content:
                   'SOS VLP [TYPE] [ZONE]\nEx: SOS VLP PHYSIQUE COCODY\nEnvoyez au : +225 07 00 115 115',
             ),
             const SizedBox(height: 10),
             _SmsCard(
               title: 'Suivi de dossier',
-              icon: Icons.access_time,
-              iconColor: AppColors.amber,
+              icon: Icons.manage_search_rounded,
+              iconColor: AppColors.warning,
               content:
-                  'SUIVI [NUMÉRO-DOSSIER]\nEx: SUIVI VLP-0941-7743\nEnvoyez au : +225 07 00 115 115',
+                  'SUIVI [NUMERO-DOSSIER]\nEx: SUIVI VLP-0941-7743\nEnvoyez au : +225 07 00 115 115',
             ),
           ],
         ),
@@ -310,17 +310,19 @@ Référence : VLP-${DateTime.now().millisecond.toString().padLeft(4, '0')}-${Dat
                   onTap: () => _keyPress(k),
                   child: Container(
                     margin: const EdgeInsets.symmetric(horizontal: 3),
-                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF3A3A3C),
-                      borderRadius: BorderRadius.circular(8),
+                      color: const Color(0xFF2C2C2E),
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(
+                          color: Colors.white.withValues(alpha: 0.05)),
                     ),
                     child: Center(
                       child: Text(k,
                           style: const TextStyle(
                               color: Colors.white,
-                              fontSize: 18,
-                              fontWeight: FontWeight.w600)),
+                              fontSize: 20,
+                              fontWeight: FontWeight.w500)),
                     ),
                   ),
                 ),

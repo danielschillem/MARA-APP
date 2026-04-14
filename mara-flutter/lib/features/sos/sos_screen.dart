@@ -171,52 +171,58 @@ class _SosScreenState extends State<SosScreen> with TickerProviderStateMixin {
   // ── Header / Greeting ─────────────────────────────────────────────────────
 
   Widget _buildGreeting() {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 14, 20, 10),
+    return Container(
+      margin: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: AppShadows.sm,
+        border: Border.all(color: AppColors.borderLight),
+      ),
       child: Row(
         children: [
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                colors: [Color(0xFF1D61B0), Color(0xFF1A2E4A)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child:
+                const Icon(Icons.shield_rounded, color: Colors.white, size: 20),
+          ),
+          const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Bonjour,',
-                    style: TextStyle(fontSize: 13, color: AppColors.muted)),
-                Text('Êtes-vous en sécurité ?',
+                const Text('VeilleProtect · Urgence',
                     style: TextStyle(
-                        fontSize: 17,
+                        fontSize: 11,
+                        color: AppColors.muted,
+                        letterSpacing: 0.2)),
+                const Text('Êtes-vous en sécurité ?',
+                    style: TextStyle(
+                        fontSize: 15,
                         fontWeight: FontWeight.w700,
                         color: AppColors.title)),
               ],
             ),
           ),
-          // GPS badge
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-            decoration: BoxDecoration(
-              color: AppColors.successLight,
-              borderRadius: BorderRadius.circular(10),
-              border:
-                  Border.all(color: AppColors.success.withValues(alpha: 0.3)),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  width: 6,
-                  height: 6,
-                  decoration: const BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: AppColors.success,
-                  ),
-                ),
-                const SizedBox(width: 5),
-                Text('GPS actif',
-                    style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.success)),
-              ],
-            ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              _StatusDot(
+                  on: _isOnline, label: _isOnline ? 'En ligne' : 'Hors-ligne'),
+              const SizedBox(height: 4),
+              const _StatusDot(
+                  on: true, label: 'GPS actif', color: AppColors.info),
+            ],
           ),
         ],
       ),
@@ -254,21 +260,37 @@ class _SosScreenState extends State<SosScreen> with TickerProviderStateMixin {
         mainAxisSize: MainAxisSize.min,
         children: [
           // Label
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
-            decoration: BoxDecoration(
-              color: AppColors.primarySurface,
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: const Text(
-              'ALERTE URGENTE',
-              style: TextStyle(
-                fontSize: 10,
-                fontWeight: FontWeight.w800,
-                letterSpacing: 0.8,
-                color: AppColors.primary,
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 8,
+                height: 8,
+                decoration: const BoxDecoration(
+                  color: AppColors.primary,
+                  shape: BoxShape.circle,
+                ),
               ),
-            ),
+              const SizedBox(width: 8),
+              const Text(
+                'ALERTE URGENTE',
+                style: TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 1.2,
+                  color: AppColors.primary,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Container(
+                width: 8,
+                height: 8,
+                decoration: const BoxDecoration(
+                  color: AppColors.primary,
+                  shape: BoxShape.circle,
+                ),
+              ),
+            ],
           ),
           SizedBox(height: size * 0.08),
           // Ring + button
@@ -484,18 +506,18 @@ class _SosScreenState extends State<SosScreen> with TickerProviderStateMixin {
 
   Widget _buildQuickGrid(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
+      padding: const EdgeInsets.fromLTRB(16, 6, 16, 4),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Padding(
-            padding: const EdgeInsets.only(left: 4, bottom: 8),
+          const Padding(
+            padding: EdgeInsets.only(left: 2, bottom: 10),
             child: Text(
               'ACTIONS RAPIDES',
               style: TextStyle(
-                  fontSize: 10,
+                  fontSize: 9,
                   fontWeight: FontWeight.w800,
-                  letterSpacing: 0.8,
+                  letterSpacing: 1.2,
                   color: AppColors.muted),
             ),
           ),
@@ -504,7 +526,8 @@ class _SosScreenState extends State<SosScreen> with TickerProviderStateMixin {
               Expanded(
                 child: _QuickBtn(
                   label: 'Appel urgence',
-                  icon: Icons.call_rounded,
+                  sub: '17 · Police',
+                  icon: Icons.phone_in_talk_rounded,
                   color: AppColors.successLight,
                   textColor: AppColors.success,
                   onTap: () {},
@@ -513,11 +536,12 @@ class _SosScreenState extends State<SosScreen> with TickerProviderStateMixin {
               const SizedBox(width: 8),
               Expanded(
                 child: _QuickBtn(
-                  label: 'Photo preuve',
-                  icon: Icons.camera_alt_rounded,
+                  label: 'Soutien chat',
+                  sub: 'Anonyme',
+                  icon: Icons.forum_rounded,
                   color: AppColors.accentLight,
                   textColor: AppColors.accent,
-                  onTap: () {},
+                  onTap: () => context.go('/chat'),
                 ),
               ),
             ],
@@ -527,7 +551,8 @@ class _SosScreenState extends State<SosScreen> with TickerProviderStateMixin {
             children: [
               Expanded(
                 child: _QuickBtn(
-                  label: 'Audio',
+                  label: 'Enregistrer audio',
+                  sub: 'Preuve vocale',
                   icon: Icons.mic_rounded,
                   color: AppColors.purpleLight,
                   textColor: AppColors.purple,
@@ -538,7 +563,8 @@ class _SosScreenState extends State<SosScreen> with TickerProviderStateMixin {
               Expanded(
                 child: _QuickBtn(
                   label: 'SMS · USSD',
-                  icon: Icons.smartphone_rounded,
+                  sub: '*115#',
+                  icon: Icons.dialpad_rounded,
                   color: AppColors.warningLight,
                   textColor: AppColors.warning,
                   onTap: () => context.go('/ussd'),
@@ -553,19 +579,53 @@ class _SosScreenState extends State<SosScreen> with TickerProviderStateMixin {
 
   Widget _buildFooter() {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Icon(Icons.lock_outline_rounded,
-              size: 10, color: AppColors.placeholder),
-          const SizedBox(width: 4),
-          Text(
-            'Chiffré de bout en bout · Anonymat garanti',
-            style: TextStyle(fontSize: 10, color: AppColors.placeholder),
-          ),
-        ],
+      padding: const EdgeInsets.fromLTRB(16, 4, 16, 10),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        decoration: BoxDecoration(
+          color: AppColors.bgAlt,
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: const Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.lock_rounded, size: 11, color: AppColors.muted),
+            SizedBox(width: 6),
+            Text(
+              'Chiffré de bout en bout  ·  Anonymat garanti',
+              style: TextStyle(
+                  fontSize: 10, color: AppColors.muted, letterSpacing: 0.1),
+            ),
+          ],
+        ),
       ),
+    );
+  }
+}
+
+// ── Status dot indicator ─────────────────────────────────────────────────────
+class _StatusDot extends StatelessWidget {
+  final bool on;
+  final String label;
+  final Color? color;
+  const _StatusDot({required this.on, required this.label, this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    final c = color ?? (on ? AppColors.success : AppColors.muted);
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 6,
+          height: 6,
+          decoration: BoxDecoration(color: c, shape: BoxShape.circle),
+        ),
+        const SizedBox(width: 4),
+        Text(label,
+            style:
+                TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: c)),
+      ],
     );
   }
 }
@@ -573,6 +633,7 @@ class _SosScreenState extends State<SosScreen> with TickerProviderStateMixin {
 // ── Quick action button ───────────────────────────────────────────────────────
 class _QuickBtn extends StatelessWidget {
   final String label;
+  final String sub;
   final IconData icon;
   final Color color;
   final Color textColor;
@@ -580,6 +641,7 @@ class _QuickBtn extends StatelessWidget {
 
   const _QuickBtn({
     required this.label,
+    required this.sub,
     required this.icon,
     required this.color,
     required this.textColor,
@@ -591,24 +653,43 @@ class _QuickBtn extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        height: 50,
-        padding: const EdgeInsets.symmetric(horizontal: 12),
+        padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
         decoration: BoxDecoration(
           color: color,
-          borderRadius: BorderRadius.circular(13),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: textColor.withValues(alpha: 0.15)),
         ),
         child: Row(
           children: [
-            Icon(icon, color: textColor, size: 18),
+            Container(
+              width: 32,
+              height: 32,
+              decoration: BoxDecoration(
+                color: textColor.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(9),
+              ),
+              child: Icon(icon, color: textColor, size: 16),
+            ),
             const SizedBox(width: 8),
             Flexible(
-              child: Text(
-                label,
-                style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: textColor),
-                overflow: TextOverflow.ellipsis,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    label,
+                    style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                        color: textColor),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  Text(
+                    sub,
+                    style: TextStyle(
+                        fontSize: 9, color: textColor.withValues(alpha: 0.7)),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
               ),
             ),
           ],
@@ -657,4 +738,3 @@ class _ArcPainter extends CustomPainter {
   @override
   bool shouldRepaint(_ArcPainter old) => old.progress != progress;
 }
-

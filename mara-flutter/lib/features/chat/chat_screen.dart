@@ -145,26 +145,60 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        elevation: 0,
+        backgroundColor: AppColors.surface,
+        surfaceTintColor: Colors.transparent,
+        leading: Padding(
+          padding: const EdgeInsets.all(10),
+          child: Container(
+            decoration: BoxDecoration(
+              color: _closed ? AppColors.danger : AppColors.success,
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              _closed
+                  ? Icons.support_agent_rounded
+                  : Icons.support_agent_rounded,
+              color: Colors.white,
+              size: 18,
+            ),
+          ),
+        ),
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Discussion confidentielle',
+            const Text('Soutien confidentiel',
                 style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700)),
-            Text(
-              _closed ? 'Discussion fermée' : 'Conseiller disponible',
-              style: TextStyle(
-                fontSize: 11,
-                color: _closed ? AppColors.muted : AppColors.green,
-              ),
+            Row(
+              children: [
+                Container(
+                  width: 6,
+                  height: 6,
+                  decoration: BoxDecoration(
+                    color: _closed ? AppColors.muted : AppColors.success,
+                    shape: BoxShape.circle,
+                  ),
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  _closed ? 'Discussion fermée' : 'Conseiller disponible',
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: _closed ? AppColors.muted : AppColors.success,
+                  ),
+                ),
+              ],
             ),
           ],
         ),
         actions: [
           if (!_closed)
-            TextButton(
+            TextButton.icon(
               onPressed: _endChat,
-              child: const Text('Terminer',
-                  style: TextStyle(color: AppColors.red, fontSize: 13)),
+              icon: const Icon(Icons.call_end_rounded,
+                  color: AppColors.danger, size: 16),
+              label: const Text('Terminer',
+                  style: TextStyle(color: AppColors.danger, fontSize: 13)),
             ),
         ],
       ),
@@ -174,24 +208,28 @@ class _ChatScreenState extends State<ChatScreen> {
               children: [
                 // Info banner
                 Container(
-                  margin: const EdgeInsets.all(12),
-                  padding: const EdgeInsets.all(12),
+                  margin: const EdgeInsets.fromLTRB(12, 8, 12, 4),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                   decoration: BoxDecoration(
-                    color: AppColors.greenLight,
+                    color: AppColors.accentLight,
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: AppColors.green.withValues(alpha: .3)),
+                    border: Border.all(
+                        color: AppColors.accent.withValues(alpha: 0.2)),
                   ),
                   child: Row(
                     children: [
-                      Icon(Icons.lock_outlined,
-                          color: AppColors.green, size: 16),
+                      const Icon(Icons.verified_user_rounded,
+                          color: AppColors.accent, size: 16),
                       const SizedBox(width: 8),
-                      Expanded(
+                      const Expanded(
                         child: Text(
-                          'Cette discussion est confidentielle et anonyme. '
+                          'Discussion chiffrée et anonyme. '
                           'Un conseiller MARA vous répondra sous peu.',
-                          style:
-                              TextStyle(fontSize: 12, color: AppColors.green),
+                          style: TextStyle(
+                              fontSize: 11,
+                              color: AppColors.accent,
+                              height: 1.5),
                         ),
                       ),
                     ],
@@ -271,34 +309,59 @@ class _BubbleWidget extends StatelessWidget {
     return Align(
       alignment: isVisitor ? Alignment.centerRight : Alignment.centerLeft,
       child: Container(
-        margin: const EdgeInsets.only(bottom: 8),
+        margin: EdgeInsets.only(
+          bottom: 6,
+          left: isVisitor ? 60 : 0,
+          right: isVisitor ? 0 : 60,
+        ),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         constraints:
-            BoxConstraints(maxWidth: MediaQuery.of(context).size.width * .75),
+            BoxConstraints(maxWidth: MediaQuery.of(context).size.width * .78),
         decoration: BoxDecoration(
-          color: isVisitor ? AppColors.navy : Colors.white,
+          color: isVisitor ? AppColors.primary : AppColors.surface,
           borderRadius: BorderRadius.only(
-            topLeft: const Radius.circular(16),
-            topRight: const Radius.circular(16),
-            bottomLeft: Radius.circular(isVisitor ? 16 : 4),
-            bottomRight: Radius.circular(isVisitor ? 4 : 16),
+            topLeft: const Radius.circular(18),
+            topRight: const Radius.circular(18),
+            bottomLeft: Radius.circular(isVisitor ? 18 : 4),
+            bottomRight: Radius.circular(isVisitor ? 4 : 18),
           ),
-          boxShadow: [
-            BoxShadow(
-                color: Colors.black.withValues(alpha: .06),
-                blurRadius: 6,
-                offset: const Offset(0, 2))
-          ],
+          boxShadow: AppShadows.sm,
         ),
         child: Column(
           crossAxisAlignment:
               isVisitor ? CrossAxisAlignment.end : CrossAxisAlignment.start,
           children: [
+            if (!isVisitor)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 4),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 14,
+                      height: 14,
+                      decoration: BoxDecoration(
+                        color: AppColors.accent,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: const Icon(Icons.support_agent_rounded,
+                          color: Colors.white, size: 9),
+                    ),
+                    const SizedBox(width: 4),
+                    const Text('Conseiller MARA',
+                        style: TextStyle(
+                            fontSize: 9,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.accent)),
+                  ],
+                ),
+              ),
             Text(
               msg.body,
               style: TextStyle(
                 color: isVisitor ? Colors.white : AppColors.ink,
                 fontSize: 14,
+                height: 1.45,
               ),
             ),
             const SizedBox(height: 4),
@@ -309,7 +372,9 @@ class _BubbleWidget extends StatelessWidget {
                   _formatTime(msg.createdAt),
                   style: TextStyle(
                     fontSize: 10,
-                    color: isVisitor ? Colors.white54 : AppColors.muted,
+                    color: isVisitor
+                        ? Colors.white.withValues(alpha: 0.65)
+                        : AppColors.muted,
                   ),
                 ),
                 if (msg.pending) ...[
@@ -349,35 +414,38 @@ class _InputBar extends StatelessWidget {
     return Container(
       padding: EdgeInsets.only(
         left: 12,
-        right: 12,
+        right: 8,
         top: 8,
         bottom: 8 + MediaQuery.of(context).padding.bottom,
       ),
       decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border(top: BorderSide(color: AppColors.border)),
+        color: AppColors.surface,
+        boxShadow: AppShadows.nav,
       ),
       child: Row(
         children: [
           Expanded(
-            child: TextField(
-              controller: controller,
-              textCapitalization: TextCapitalization.sentences,
-              maxLines: 4,
-              minLines: 1,
-              decoration: InputDecoration(
-                hintText: 'Votre message…',
-                hintStyle: TextStyle(color: AppColors.muted),
-                filled: true,
-                fillColor: AppColors.bg,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(22),
-                  borderSide: BorderSide.none,
-                ),
-                contentPadding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            child: Container(
+              decoration: BoxDecoration(
+                color: AppColors.bg,
+                borderRadius: BorderRadius.circular(24),
+                border: Border.all(color: AppColors.border),
               ),
-              onSubmitted: (_) => onSend(),
+              child: TextField(
+                controller: controller,
+                textCapitalization: TextCapitalization.sentences,
+                maxLines: 4,
+                minLines: 1,
+                decoration: InputDecoration(
+                  hintText: 'Votre message…',
+                  hintStyle: const TextStyle(
+                      color: AppColors.placeholder, fontSize: 14),
+                  border: InputBorder.none,
+                  contentPadding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                ),
+                onSubmitted: (_) => onSend(),
+              ),
             ),
           ),
           const SizedBox(width: 8),
@@ -387,11 +455,22 @@ class _InputBar extends StatelessWidget {
               width: 44,
               height: 44,
               decoration: BoxDecoration(
-                color: AppColors.navy,
+                gradient: const LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [Color(0xFFC8143E), Color(0xFF8C0C2A)],
+                ),
                 shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.primary.withValues(alpha: 0.35),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
               ),
               child:
-                  const Icon(Icons.send_rounded, color: Colors.white, size: 20),
+                  const Icon(Icons.send_rounded, color: Colors.white, size: 18),
             ),
           ),
         ],

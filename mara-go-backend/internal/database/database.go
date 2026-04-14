@@ -150,6 +150,13 @@ func seedSosNumbers(db *gorm.DB) {
 }
 
 func seedServices(db *gorm.DB) {
+	// If old Côte d'Ivoire data exists (detected by region "Abidjan"), purge and reseed with BF data.
+	var ciCount int64
+	db.Model(&models.ServiceDirectory{}).Where("region = ?", "Abidjan").Count(&ciCount)
+	if ciCount > 0 {
+		db.Exec("DELETE FROM service_directories")
+	}
+
 	var count int64
 	db.Model(&models.ServiceDirectory{}).Count(&count)
 	if count > 0 {
@@ -158,21 +165,49 @@ func seedServices(db *gorm.DB) {
 	services := []models.ServiceDirectory{
 		// Centre (Ouagadougou)
 		{Name: "Police Nationale — Commissariat Central", Type: "securite", Region: "Centre", Phone: "17", Address: "Avenue de l'Indépendance, Ouagadougou", Description: "Commissariat central de Ouagadougou, disponible 24h/24", Lat: 12.3647, Lng: -1.5330},
-		{Name: "SAMU Burkina Faso", Type: "urgence", Region: "Centre", Phone: "15", Address: "CHU Yalgado Ouédraogo, Ouagadougou", Description: "Service d'aide médicale urgente", Lat: 12.3620, Lng: -1.5202},
-		{Name: "Association Voix de Femmes", Type: "ong", Region: "Centre", Phone: "+226 25 33 44 55", Address: "Secteur 15, Ouagadougou", Description: "Association de defense des droits des femmes", Lat: 12.3575, Lng: -1.5415},
-		{Name: "CHU Yalgado Ouédraogo", Type: "medical", Region: "Centre", Phone: "+226 25 30 66 44", Address: "Avenue de l'Oubritenga, Ouagadougou", Description: "Centre hospitalier universitaire principal", Lat: 12.3621, Lng: -1.5201},
-		{Name: "Ministère de la Femme et de la Solidarité", Type: "institutionnel", Region: "Centre", Phone: "+226 25 32 74 44", Address: "Avenue de l'Indépendance, Ouagadougou", Description: "Direction des affaires sociales et de la protection de la femme", Lat: 12.3680, Lng: -1.5280},
-		{Name: "Barreau du Burkina Faso", Type: "juridique", Region: "Centre", Phone: "+226 25 30 67 37", Address: "Avenue de la Nation, Ouagadougou", Description: "Aide juridictionnelle et assistance aux victimes", Lat: 12.3655, Lng: -1.5260},
+		{Name: "Gendarmerie Nationale — Escadron de Ouaga", Type: "securite", Region: "Centre", Phone: "16", Address: "Avenue de la Grande Chancellerie, Ouagadougou", Description: "Gendarmerie nationale, recoit les plaintes de violences", Lat: 12.3660, Lng: -1.5350},
+		{Name: "SAMU Burkina Faso", Type: "urgence", Region: "Centre", Phone: "15", Address: "CHU Yalgado Ouédraogo, Ouagadougou", Description: "Service d'aide médicale urgente, disponible 24h/24", Lat: 12.3620, Lng: -1.5202},
+		{Name: "Pompiers — Bataillon National", Type: "urgence", Region: "Centre", Phone: "18", Address: "Avenue de la Résistance du 17 mai, Ouagadougou", Description: "Brigade nationale de sapeurs-pompiers", Lat: 12.3601, Lng: -1.5315},
+		{Name: "Association Voix de Femmes", Type: "ong", Region: "Centre", Phone: "+226 25 33 44 55", Address: "Secteur 15, Ouagadougou", Description: "Association de défense des droits des femmes et des enfants", Lat: 12.3575, Lng: -1.5415},
+		{Name: "AFJB — Association des Femmes Juristes du Burkina", Type: "juridique", Region: "Centre", Phone: "+226 25 33 12 30", Address: "Secteur 4, Ouagadougou", Description: "Aide juridique gratuite pour les femmes victimes de violence", Lat: 12.3640, Lng: -1.5380},
+		{Name: "CHU Yalgado Ouédraogo", Type: "medical", Region: "Centre", Phone: "+226 25 30 66 44", Address: "Avenue de l'Oubritenga, Ouagadougou", Description: "Centre hospitalier universitaire, accueil urgences 24h/24", Lat: 12.3621, Lng: -1.5201},
+		{Name: "Centre Médical Protestant — Ouagadougou", Type: "medical", Region: "Centre", Phone: "+226 25 34 03 55", Address: "Avenue de la Liberté, Ouagadougou", Description: "Centre médical privé avec unité de prise en charge VBG", Lat: 12.3590, Lng: -1.5250},
+		{Name: "Ministère de la Femme, de la Solidarité Nationale et de la Famille", Type: "institutionnel", Region: "Centre", Phone: "+226 25 32 74 44", Address: "Avenue de l'Indépendance, Ouagadougou", Description: "Direction des affaires sociales et de la protection de la femme", Lat: 12.3680, Lng: -1.5280},
+		{Name: "Barreau du Burkina Faso", Type: "juridique", Region: "Centre", Phone: "+226 25 30 67 37", Address: "Avenue de la Nation, Ouagadougou", Description: "Aide juridictionnelle et assistance gratuite aux victimes", Lat: 12.3655, Lng: -1.5260},
+		{Name: "Centre d'Écoute et de Conseil Juridique (CECJ)", Type: "ong", Region: "Centre", Phone: "+226 25 36 13 47", Address: "Secteur 28, Ouagadougou", Description: "Écoute et conseil juridique gratuit pour femmes et enfants", Lat: 12.3530, Lng: -1.5400},
 		// Hauts-Bassins (Bobo-Dioulasso)
-		{Name: "Commissariat Régional Hauts-Bassins", Type: "securite", Region: "Hauts-Bassins", Phone: "17", Address: "Bobo-Dioulasso", Description: "Police nationale regional Hauts-Bassins", Lat: 11.1771, Lng: -4.2979},
-		{Name: "CHR Souro Sanou Bobo", Type: "medical", Region: "Hauts-Bassins", Phone: "+226 20 97 00 27", Address: "Boulevard de la Résistance, Bobo-Dioulasso", Description: "Centre hospitalier régional de Bobo-Dioulasso", Lat: 11.1750, Lng: -4.2965},
-		{Name: "Association AVVS Bobo", Type: "ong", Region: "Hauts-Bassins", Phone: "+226 20 97 11 22", Address: "Secteur 3, Bobo-Dioulasso", Description: "Aide aux victimes de violences sexuelles", Lat: 11.1800, Lng: -4.3010},
+		{Name: "Commissariat Régional Hauts-Bassins", Type: "securite", Region: "Hauts-Bassins", Phone: "17", Address: "Bobo-Dioulasso", Description: "Police nationale régionale Hauts-Bassins, plaintes 24h/24", Lat: 11.1771, Lng: -4.2979},
+		{Name: "CHR Souro Sanou — Bobo-Dioulasso", Type: "medical", Region: "Hauts-Bassins", Phone: "+226 20 97 00 27", Address: "Boulevard de la Résistance, Bobo-Dioulasso", Description: "Centre hospitalier régional, urgences et prise en charge VBG", Lat: 11.1750, Lng: -4.2965},
+		{Name: "Association AVVS Bobo", Type: "ong", Region: "Hauts-Bassins", Phone: "+226 20 97 11 22", Address: "Secteur 3, Bobo-Dioulasso", Description: "Aide aux victimes de violences sexuelles et domestiques", Lat: 11.1800, Lng: -4.3010},
+		{Name: "Direction Régionale de la Femme — Hauts-Bassins", Type: "institutionnel", Region: "Hauts-Bassins", Phone: "+226 20 97 32 10", Address: "Bobo-Dioulasso", Description: "Service de protection de la femme et de la famille", Lat: 11.1760, Lng: -4.3000},
 		// Centre-Nord
 		{Name: "Direction Régionale de la Femme — Centre-Nord", Type: "institutionnel", Region: "Centre-Nord", Phone: "+226 40 45 00 11", Address: "Kaya", Description: "Service de protection de la femme et de l'enfant", Lat: 13.0939, Lng: -1.0867},
+		{Name: "CHR de Kaya", Type: "medical", Region: "Centre-Nord", Phone: "+226 40 45 00 44", Address: "Kaya", Description: "Centre hospitalier régional du Centre-Nord", Lat: 13.0920, Lng: -1.0850},
 		// Nord
-		{Name: "Commissariat Provinciale — Loroum", Type: "securite", Region: "Nord", Phone: "17", Address: "Titao", Description: "Police nationale provinciale du Loroum", Lat: 13.7694, Lng: -2.0760},
+		{Name: "Commissariat Provincial — Loroum", Type: "securite", Region: "Nord", Phone: "17", Address: "Titao", Description: "Police nationale provinciale du Loroum", Lat: 13.7694, Lng: -2.0760},
+		{Name: "CHR de Ouahigouya", Type: "medical", Region: "Nord", Phone: "+226 40 55 00 24", Address: "Ouahigouya", Description: "Centre hospitalier régional du Nord", Lat: 13.5751, Lng: -2.4162},
 		// Est
-		{Name: "CHR de Fada N'Gourma", Type: "medical", Region: "Est", Phone: "+226 40 77 00 24", Address: "Fada N'Gourma", Description: "Centre hospitalier régional de l'Est", Lat: 12.0583, Lng: 0.3463},
+		{Name: "CHR de Fada N'Gourma", Type: "medical", Region: "Est", Phone: "+226 40 77 00 24", Address: "Fada N'Gourma", Description: "Centre hospitalier régional de l'Est, urgences VBG", Lat: 12.0583, Lng: 0.3463},
+		{Name: "Direction Régionale de la Femme — Est", Type: "institutionnel", Region: "Est", Phone: "+226 40 77 12 33", Address: "Fada N'Gourma", Description: "Service d'action sociale et de protection de la famille", Lat: 12.0600, Lng: 0.3480},
+		// Sahel
+		{Name: "CHR de Dori", Type: "medical", Region: "Sahel", Phone: "+226 40 46 00 35", Address: "Dori", Description: "Centre hospitalier régional du Sahel", Lat: 14.0352, Lng: -0.0325},
+		{Name: "Commissariat Provincial — Dori", Type: "securite", Region: "Sahel", Phone: "17", Address: "Dori", Description: "Police nationale provinciale du Sahel", Lat: 14.0340, Lng: -0.0310},
+		// Boucle du Mouhoun
+		{Name: "CHR de Dédougou", Type: "medical", Region: "Boucle du Mouhoun", Phone: "+226 20 52 13 26", Address: "Dédougou", Description: "Centre hospitalier régional de la Boucle du Mouhoun", Lat: 12.4629, Lng: -3.4636},
+		// Cascades
+		{Name: "CHR de Banfora", Type: "medical", Region: "Cascades", Phone: "+226 20 91 02 34", Address: "Banfora", Description: "Centre hospitalier régional des Cascades", Lat: 10.6323, Lng: -4.7651},
+		{Name: "Gendarmerie — Brigade de Banfora", Type: "securite", Region: "Cascades", Phone: "16", Address: "Banfora", Description: "Brigade territoriale de gendarmerie de Banfora", Lat: 10.6300, Lng: -4.7630},
+		// Centre-Est
+		{Name: "CHR de Tenkodogo", Type: "medical", Region: "Centre-Est", Phone: "+226 40 71 01 44", Address: "Tenkodogo", Description: "Centre hospitalier régional du Centre-Est", Lat: 11.7800, Lng: -0.3700},
+		// Centre-Ouest
+		{Name: "CHR de Koudougou", Type: "medical", Region: "Centre-Ouest", Phone: "+226 25 44 05 11", Address: "Koudougou", Description: "Centre hospitalier régional du Centre-Ouest", Lat: 12.2548, Lng: -2.3631},
+		{Name: "Maison de la Femme de Koudougou", Type: "ong", Region: "Centre-Ouest", Phone: "+226 25 44 18 90", Address: "Koudougou", Description: "Centre d'accueil, d'écoute et de formation pour femmes", Lat: 12.2555, Lng: -2.3650},
+		// Sud-Ouest
+		{Name: "CHR de Gaoua", Type: "medical", Region: "Sud-Ouest", Phone: "+226 20 87 00 62", Address: "Gaoua", Description: "Centre hospitalier régional du Sud-Ouest", Lat: 10.3236, Lng: -3.1770},
+		// Plateau Central
+		{Name: "CHR de Ziniaré", Type: "medical", Region: "Plateau Central", Phone: "+226 25 45 00 77", Address: "Ziniaré", Description: "Centre hospitalier régional du Plateau Central", Lat: 12.5754, Lng: -1.2906},
+		// Centre-Sud
+		{Name: "CHR de Manga", Type: "medical", Region: "Centre-Sud", Phone: "+226 40 43 00 51", Address: "Manga", Description: "Centre hospitalier régional du Centre-Sud", Lat: 11.6637, Lng: -1.0715},
 	}
 	db.Create(&services)
 }

@@ -8,9 +8,9 @@ import IconBadge from '../components/IconBadge';
 
 const COLORS = ['#7B2FBE', '#E8541E', '#27AE60', '#F39C12', '#E74C3C', '#3498DB', '#9B59B6', '#1ABC9C'];
 
-const STATUS_LABELS = { nouveau: 'Nouveau', en_cours: 'En cours', resolu: 'Résolu', urgent: 'Urgent', cloture: 'Clôturé' };
-const STATUS_BADGE = { nouveau: 'badge-purple', en_cours: 'badge-warning', resolu: 'badge-success', urgent: 'badge-danger', cloture: 'badge-orange' };
-const PRIORITY_BADGE = { basse: 'badge-success', moyenne: 'badge-purple', haute: 'badge-warning', critique: 'badge-danger' };
+const STATUS_LABELS = { new: 'Nouveau', assigned: 'Assigné', inprogress: 'En cours', resolved: 'Résolu', closed: 'Clôturé' };
+const STATUS_BADGE = { new: 'badge-purple', assigned: 'badge-info', inprogress: 'badge-warning', resolved: 'badge-success', closed: 'badge-orange' };
+const PRIORITY_BADGE = { low: 'badge-success', medium: 'badge-purple', high: 'badge-warning', critical: 'badge-danger' };
 
 export default function DashboardPage() {
   const { user } = useAuth();
@@ -21,7 +21,7 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (!user) { navigate('/login'); return; }
-    api.get('/dashboard').then(r => setStats(r.data)).catch(() => {}).finally(() => setLoading(false));
+    api.get('/dashboard').then(r => setStats(r.data)).catch(() => { }).finally(() => setLoading(false));
   }, [user, navigate]);
 
   if (!user) return null;
@@ -277,7 +277,7 @@ function ReportsTab() {
       setReports(r.data.data || []);
       setMeta({ last_page: r.data.last_page, current_page: r.data.current_page, total: r.data.total });
       setPage(p);
-    }).catch(() => {}).finally(() => setLoading(false));
+    }).catch(() => { }).finally(() => setLoading(false));
   };
 
   useEffect(() => { fetchReports(); }, []);

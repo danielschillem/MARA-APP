@@ -118,6 +118,87 @@ class ApiService {
     return res.data;
   }
 
+  // ── Resources ─────────────────────────────────────────────────────────────
+  Future<List<dynamic>> getResources({String? category}) async {
+    final res = await _dio.get('/resources', queryParameters: {
+      if (category != null && category != 'all') 'category': category,
+    });
+    return res.data is List ? res.data : (res.data['data'] ?? []);
+  }
+
+  Future<Map<String, dynamic>> getResource(int id) async {
+    final res = await _dio.get('/resources/$id');
+    return res.data is Map<String, dynamic> ? res.data : {};
+  }
+
+  // ── Announcements ─────────────────────────────────────────────────────────
+  Future<List<dynamic>> getAnnouncements() async {
+    final res = await _dio.get('/announcements');
+    return res.data is List ? res.data : (res.data['data'] ?? []);
+  }
+
+  // ── Profile ───────────────────────────────────────────────────────────────
+  Future<Map<String, dynamic>> getMe() async {
+    final res = await _dio.get('/me');
+    return res.data is Map<String, dynamic> ? res.data : {};
+  }
+
+  // ── Dashboard ─────────────────────────────────────────────────────────────
+  Future<Map<String, dynamic>> getDashboard() async {
+    final res = await _dio.get('/dashboard');
+    return res.data is Map<String, dynamic> ? res.data : {};
+  }
+
+  Future<List<dynamic>> getReports({
+    String? status,
+    String? region,
+    String? priority,
+  }) async {
+    final res = await _dio.get('/reports', queryParameters: {
+      if (status != null) 'status': status,
+      if (region != null) 'region': region,
+      if (priority != null) 'priority': priority,
+    });
+    return res.data is List ? res.data : (res.data['data'] ?? []);
+  }
+
+  Future<Map<String, dynamic>> getReport(int id) async {
+    final res = await _dio.get('/reports/$id');
+    return res.data is Map<String, dynamic> ? res.data : {};
+  }
+
+  Future<Map<String, dynamic>> updateReport(
+      int id, Map<String, dynamic> data) async {
+    final res = await _dio.put('/reports/$id', data: data);
+    return res.data is Map<String, dynamic> ? res.data : {};
+  }
+
+  Future<List<dynamic>> getConversations() async {
+    final res = await _dio.get('/conversations');
+    return res.data is List ? res.data : (res.data['data'] ?? []);
+  }
+
+  Future<void> closeConversation(int convId) async {
+    await _dio.post('/conversations/$convId/close');
+  }
+
+  // ── Observatory ───────────────────────────────────────────────────────────
+  Future<Map<String, dynamic>> getObservatoryStats() async {
+    final res = await _dio.get('/observatory/stats');
+    return res.data is Map<String, dynamic> ? res.data : {};
+  }
+
+  Future<Map<String, dynamic>> getObservatoryReports({
+    String? country,
+    int page = 1,
+  }) async {
+    final res = await _dio.get('/observatory/reports', queryParameters: {
+      'page': page,
+      if (country != null && country != 'all') 'country': country,
+    });
+    return res.data is Map<String, dynamic> ? res.data : {};
+  }
+
   // ── Conversations ─────────────────────────────────────────────────────────
   Future<Map<String, dynamic>> startAnonymousChat() async {
     final res = await _dio.post('/conversations/anonymous');
@@ -126,7 +207,7 @@ class ApiService {
 
   Future<List<dynamic>> getMessages(int convId) async {
     final res = await _dio.get('/conversations/$convId/messages');
-    return res.data;
+    return res.data is List ? res.data : (res.data['data'] ?? []);
   }
 
   Future<void> sendMessage(int convId, String body, String token) async {

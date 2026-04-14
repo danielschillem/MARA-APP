@@ -4,6 +4,7 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"net/http"
+	"strconv"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/mara-app/backend/internal/middleware"
@@ -115,9 +116,33 @@ func (h *ConversationHandler) SendMessage(w http.ResponseWriter, r *http.Request
 }
 
 func (h *ConversationHandler) Index(w http.ResponseWriter, r *http.Request) {
+	q := h.db.Model(&models.Conversation{}).Preload("User").Preload("Conseiller")
+
+	if status := r.URL.Query().Get("status"); status != "" {
+		q = q.Where("status = ?", status)
+	}
+
+	page, _ := strconv.Atoi(r.URL.Query().Get("page"))
+	if page < 1 {
+		page = 1
+	}
+	perPage, _ := strconv.Atoi(r.URL.Query().Get("per_page"))
+	if perPage < 1 || perPage > 100 {
+		perPage = 20
+	}
+
+	var total int64
+	q.Count(&total)
+
 	var convs []models.Conversation
-	h.db.Preload("User").Preload("Conseiller").Order("updated_at DESC").Find(&convs)
-	jsonOK(w, convs)
+	q.Order("updated_at DESC").Limit(perPage).Offset((page - 1) * perPage).Find(&convs)
+
+	jsonOK(w, map[string]interface{}{
+		"data":     convs,
+		"total":    total,
+		"page":     page,
+		"per_page": perPage,
+	})
 }
 
 func (h *ConversationHandler) Store(w http.ResponseWriter, r *http.Request) {

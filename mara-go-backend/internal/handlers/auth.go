@@ -151,3 +151,51 @@ func (h *AuthHandler) ChangePassword(w http.ResponseWriter, r *http.Request) {
 	h.db.Model(&user).Update("password", string(hash))
 	jsonOK(w, map[string]string{"message": "password updated"})
 }
+
+// PUT /api/me — update own profile fields (name, titre, specialite, organisation, zone, avatar)
+func (h *AuthHandler) UpdateProfile(w http.ResponseWriter, r *http.Request) {
+	claims := middleware.ClaimsFromCtx(r)
+	var req struct {
+		Name         string `json:"name"`
+		Titre        string `json:"titre"`
+		Specialite   string `json:"specialite"`
+		Organisation string `json:"organisation"`
+		Zone         string `json:"zone"`
+		Avatar       string `json:"avatar"`
+	}
+	if err := decode(r, &req); err != nil {
+		jsonError(w, "invalid body", http.StatusBadRequest)
+		return
+	}
+
+	updates := map[string]interface{}{}
+	if req.Name != "" {
+		updates["name"] = req.Name
+	}
+	if req.Titre != "" {
+		updates["titre"] = req.Titre
+	}
+	if req.Specialite != "" {
+		updates["specialite"] = req.Specialite
+	}
+	if req.Organisation != "" {
+		updates["organisation"] = req.Organisation
+	}
+	if req.Zone != "" {
+		updates["zone"] = req.Zone
+	}
+	if req.Avatar != "" {
+		updates["avatar"] = req.Avatar
+	}
+
+	if len(updates) == 0 {
+		jsonError(w, "no fields to update", http.StatusBadRequest)
+		return
+	}
+
+	h.db.Model(&models.User{}).Where("id = ?", claims.UserID).Updates(updates)
+
+	var user models.User
+	h.db.First(&user, claims.UserID)
+	jsonOK(w, user)
+}

@@ -27,14 +27,20 @@ export function AuthProvider({ children }) {
   };
 
   const logout = async () => {
-    try { await api.post('/logout'); } catch {}
+    try { await api.post('/logout'); } catch { }
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     setUser(null);
   };
 
+  const updateUser = (updated) => {
+    const merged = { ...user, ...updated };
+    localStorage.setItem('user', JSON.stringify(merged));
+    setUser(merged);
+  };
+
   return (
-    <AuthContext.Provider value={{ user, login, register, logout, loading }}>
+    <AuthContext.Provider value={{ user, login, register, logout, updateUser, loading }}>
       {children}
     </AuthContext.Provider>
   );

@@ -4,10 +4,10 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import api from '../api';
 import { FileText, Search, Filter, X, ChevronLeft, ChevronRight, Edit3, UserPlus, Save, AlertTriangle, MapPin, Calendar, Clock, User, Shield, Download } from 'lucide-react';
 
-const STATUS_LABELS = { nouveau: 'Nouveau', en_cours: 'En cours', resolu: 'Résolu', urgent: 'Urgent', cloture: 'Clôturé' };
-const STATUS_BADGE = { nouveau: 'badge-purple', en_cours: 'badge-warning', resolu: 'badge-success', urgent: 'badge-danger', cloture: 'badge-orange' };
-const PRIORITY_LABELS = { basse: 'Basse', moyenne: 'Moyenne', haute: 'Haute', critique: 'Critique' };
-const PRIORITY_BADGE = { basse: 'badge-success', moyenne: 'badge-purple', haute: 'badge-warning', critique: 'badge-danger' };
+const STATUS_LABELS = { new: 'Nouveau', assigned: 'Assigné', inprogress: 'En cours', resolved: 'Résolu', closed: 'Clôturé' };
+const STATUS_BADGE = { new: 'badge-purple', assigned: 'badge-info', inprogress: 'badge-warning', resolved: 'badge-success', closed: 'badge-orange' };
+const PRIORITY_LABELS = { low: 'Basse', medium: 'Moyenne', high: 'Haute', critical: 'Critique' };
+const PRIORITY_BADGE = { low: 'badge-success', medium: 'badge-purple', high: 'badge-warning', critical: 'badge-danger' };
 
 export default function ReportManagementPage() {
   const { user } = useAuth();

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log/slog"
 	"net/http"
 	"os"
@@ -52,6 +53,7 @@ func main() {
 	teamH := handlers.NewTeamHandler(db)
 	obsH := handlers.NewObservatoryHandler(db, cfg.ReliefWebURL)
 	userH := handlers.NewUserHandler(db)
+	annH := handlers.NewAnnouncementHandler(db)
 
 	r := chi.NewRouter()
 
@@ -71,7 +73,16 @@ func main() {
 	r.Route("/api", func(r chi.Router) {
 		// ── Health ──────────────────────────────────────────────────────────────
 		r.Get("/health", func(w http.ResponseWriter, r *http.Request) {
-			w.Write([]byte(`{"status":"ok","app":"MARA API","version":"2.0.0"}`))
+			sqlDB, err := db.DB()
+			dbStatus := "ok"
+			if err != nil || sqlDB.Ping() != nil {
+				dbStatus = "degraded"
+			}
+			w.Header().Set("Content-Type", "application/json")
+			if dbStatus == "degraded" {
+				w.WriteHeader(http.StatusServiceUnavailable)
+			}
+			fmt.Fprintf(w, `{"status":"ok","db":"%s","app":"MARA API","version":"2.0.0"}`, dbStatus)
 		})
 
 		// ── Auth (rate limited) ───────────────────────────────────────────────────
@@ -85,6 +96,7 @@ func main() {
 		r.Get("/services", dirH.Services)
 		r.Get("/resources", resH.Index)
 		r.Get("/resources/{id}", resH.Show)
+		r.Get("/announcements", annH.Index)
 
 		// ── Public reports ───────────────────────────────────────────────────────
 		r.Post("/reports", reportH.Store)
@@ -113,6 +125,7 @@ func main() {
 
 			r.Post("/logout", authH.Logout)
 			r.Get("/me", authH.Me)
+			r.Put("/me", authH.UpdateProfile)
 			r.Post("/change-password", authH.ChangePassword)
 
 			// Dashboard
@@ -124,17 +137,34 @@ func main() {
 			r.Get("/reports/export", reportH.Export)
 			r.Get("/reports/{id}", reportH.Show)
 			r.Put("/reports/{id}", reportH.Update)
+			r.Post("/reports/{id}/assign", reportH.Assign)
 
 			// Observatory admin (force sync)
 			r.With(authmw.RequireRole(models.RoleAdmin)).Post("/observatory/reliefweb/sync", obsH.SyncReliefWeb)
 
-			// Admin — user management
+			// Admin — user management + services + SOS + announcements
 			r.Group(func(r chi.Router) {
 				r.Use(authmw.RequireRole(models.RoleAdmin))
 				r.Get("/admin/users", userH.Index)
 				r.Post("/admin/users", userH.Store)
 				r.Put("/admin/users/{id}", userH.Update)
 				r.Delete("/admin/users/{id}", userH.Destroy)
+
+				// Services CRUD
+				r.Post("/admin/services", dirH.ServiceStore)
+				r.Put("/admin/services/{id}", dirH.ServiceUpdate)
+				r.Delete("/admin/services/{id}", dirH.ServiceDestroy)
+
+				// SOS Numbers CRUD
+				r.Post("/admin/sos-numbers", dirH.SosStore)
+				r.Put("/admin/sos-numbers/{id}", dirH.SosUpdate)
+				r.Delete("/admin/sos-numbers/{id}", dirH.SosDestroy)
+
+				// Announcements CRUD
+				r.Get("/admin/announcements", annH.AdminIndex)
+				r.Post("/admin/announcements", annH.Store)
+				r.Put("/admin/announcements/{id}", annH.Update)
+				r.Delete("/admin/announcements/{id}", annH.Destroy)
 			})
 
 			// Alerts (VeilleProtect coordinator)

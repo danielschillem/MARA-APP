@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/mara-app/backend/internal/models"
@@ -21,12 +22,34 @@ func (h *ResourceHandler) Index(w http.ResponseWriter, r *http.Request) {
 	if t := r.URL.Query().Get("type"); t != "" {
 		q = q.Where("type = ?", t)
 	}
+	if cat := r.URL.Query().Get("category"); cat != "" {
+		q = q.Where("category = ?", cat)
+	}
 	if search := r.URL.Query().Get("search"); search != "" {
 		q = q.Where("title LIKE ? OR summary LIKE ?", "%"+search+"%", "%"+search+"%")
 	}
+
+	page, _ := strconv.Atoi(r.URL.Query().Get("page"))
+	if page < 1 {
+		page = 1
+	}
+	perPage, _ := strconv.Atoi(r.URL.Query().Get("per_page"))
+	if perPage < 1 || perPage > 100 {
+		perPage = 20
+	}
+
+	var total int64
+	q.Model(&models.Resource{}).Count(&total)
+
 	var resources []models.Resource
-	q.Order("created_at DESC").Find(&resources)
-	jsonOK(w, resources)
+	q.Order("created_at DESC").Limit(perPage).Offset((page - 1) * perPage).Find(&resources)
+
+	jsonOK(w, map[string]interface{}{
+		"data":     resources,
+		"total":    total,
+		"page":     page,
+		"per_page": perPage,
+	})
 }
 
 func (h *ResourceHandler) Show(w http.ResponseWriter, r *http.Request) {

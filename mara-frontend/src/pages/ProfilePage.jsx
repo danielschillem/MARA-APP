@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../components/Toast';
-import { User, Lock, Shield, Check, X, Eye, EyeOff } from 'lucide-react';
+import { User, Lock, Shield, Check, X, Eye, EyeOff, Save } from 'lucide-react';
 import api from '../api';
 
 const PASSWORD_RULES = [
@@ -16,11 +16,38 @@ const ROLE_LABELS = {
   admin: 'Administrateur',
   professionnel: 'Professionnel',
   conseiller: 'Conseiller',
+  coordinateur: 'Coordinateur',
 };
 
 export default function ProfilePage() {
-  const { user } = useAuth();
+  const { user, updateUser } = useAuth();
   const { addToast } = useToast();
+
+  // ── Profile form ──────────────────────────────────────────────────────────
+  const [profileForm, setProfileForm] = useState({
+    name: user?.name || '',
+    titre: user?.titre || '',
+    specialite: user?.specialite || '',
+    organisation: user?.organisation || '',
+    zone: user?.zone || '',
+  });
+  const [profileLoading, setProfileLoading] = useState(false);
+
+  const handleUpdateProfile = async (e) => {
+    e.preventDefault();
+    if (!profileForm.name.trim()) { addToast('Le nom est requis.', 'error'); return; }
+    setProfileLoading(true);
+    try {
+      const { data } = await api.put('/me', profileForm);
+      updateUser(data);
+      addToast('Profil mis à jour avec succès !', 'success');
+    } catch {
+      addToast('Erreur lors de la mise à jour du profil.', 'error');
+    }
+    setProfileLoading(false);
+  };
+
+  // ── Password form ─────────────────────────────────────────────────────────
   const [form, setForm] = useState({ current_password: '', password: '', password_confirmation: '' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -47,7 +74,7 @@ export default function ProfilePage() {
     } catch (err) {
       const msg = err.response?.data?.errors
         ? Object.values(err.response.data.errors).flat().join(', ')
-        : err.response?.data?.message || 'Erreur lors du changement de mot de passe.';
+        : err.response?.data?.message || err.response?.data?.error || 'Erreur lors du changement de mot de passe.';
       setError(msg);
     }
     setLoading(false);
@@ -60,36 +87,83 @@ export default function ProfilePage() {
   );
 
   return (
-    <div className="section" style={{ maxWidth: 600 }}>
+    <div className="section" style={{ maxWidth: 640 }}>
       <div className="section-title">
         <h2>Mon Profil</h2>
-        <p>Gérez vos informations et votre sécurité</p>
+        <p>Gérez vos informations personnelles et votre sécurité</p>
       </div>
 
-      {/* User Info Card */}
+      {/* ── Identity summary ── */}
       <div className="card" style={{ marginBottom: 24 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 20 }}>
-          <div style={{ width: 56, height: 56, borderRadius: '50%', background: 'linear-gradient(135deg, var(--purple), var(--orange))', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <User size={28} color="white" />
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+          <div style={{
+            width: 56, height: 56, borderRadius: '50%',
+            background: 'linear-gradient(135deg, var(--purple), var(--orange))',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+          }}>
+            <span style={{ fontSize: 22, fontWeight: 700, color: 'white' }}>
+              {user.name?.slice(0, 1).toUpperCase()}
+            </span>
           </div>
           <div>
-            <h3 style={{ margin: 0 }}>{user.name}</h3>
-            <p style={{ color: 'var(--text-light)', fontSize: 13, margin: 0 }}>{user.email}</p>
+            <div style={{ fontWeight: 700, fontSize: 16 }}>{user.name}</div>
+            <div style={{ color: 'var(--text-light)', fontSize: 13 }}>{user.email}</div>
+            <span className="badge badge-purple" style={{ marginTop: 4, display: 'inline-block' }}>
+              {ROLE_LABELS[user.role] || user.role}
+            </span>
           </div>
-        </div>
-        <div style={{ display: 'grid', gap: 12 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0', borderBottom: '1px solid var(--border)' }}>
-            <span style={{ color: 'var(--text-light)', fontSize: 13 }}>Rôle</span>
-            <span className="badge badge-purple">{ROLE_LABELS[user.role] || user.role}</span>
-          </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0' }}>
-            <span style={{ color: 'var(--text-light)', fontSize: 13 }}>Membre depuis</span>
-            <strong style={{ fontSize: 13 }}>{new Date(user.created_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}</strong>
+          <div style={{ marginLeft: 'auto', textAlign: 'right', fontSize: 12, color: 'var(--text-light)' }}>
+            <div>Membre depuis</div>
+            <strong>{new Date(user.created_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}</strong>
           </div>
         </div>
       </div>
 
-      {/* Change Password Card */}
+      {/* ── Edit profile form ── */}
+      <div className="card" style={{ marginBottom: 24 }}>
+        <h3 style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 20 }}>
+          <User size={20} color="var(--purple)" /> Informations personnelles
+        </h3>
+        <form onSubmit={handleUpdateProfile}>
+          <div className="grid-2" style={{ gap: 16 }}>
+            <div className="form-group">
+              <label className="form-label">Nom complet *</label>
+              <input className="form-input" value={profileForm.name}
+                onChange={e => setProfileForm(f => ({ ...f, name: e.target.value }))}
+                placeholder="Votre nom" />
+            </div>
+            <div className="form-group">
+              <label className="form-label">Titre / Fonction</label>
+              <input className="form-input" value={profileForm.titre}
+                onChange={e => setProfileForm(f => ({ ...f, titre: e.target.value }))}
+                placeholder="ex. Travailleur social" />
+            </div>
+            <div className="form-group">
+              <label className="form-label">Spécialité</label>
+              <input className="form-input" value={profileForm.specialite}
+                onChange={e => setProfileForm(f => ({ ...f, specialite: e.target.value }))}
+                placeholder="ex. Violences basées sur le genre" />
+            </div>
+            <div className="form-group">
+              <label className="form-label">Organisation</label>
+              <input className="form-input" value={profileForm.organisation}
+                onChange={e => setProfileForm(f => ({ ...f, organisation: e.target.value }))}
+                placeholder="ex. ONEF" />
+            </div>
+            <div className="form-group">
+              <label className="form-label">Zone d'intervention</label>
+              <input className="form-input" value={profileForm.zone}
+                onChange={e => setProfileForm(f => ({ ...f, zone: e.target.value }))}
+                placeholder="ex. Ouagadougou, Hauts-Bassins" />
+            </div>
+          </div>
+          <button className="btn btn-primary" type="submit" disabled={profileLoading} style={{ marginTop: 8 }}>
+            <Save size={15} /> {profileLoading ? 'Enregistrement...' : 'Enregistrer'}
+          </button>
+        </form>
+      </div>
+
+      {/* ── Change Password Card ── */}
       <div className="card">
         <h3 style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 20 }}>
           <Lock size={20} color="var(--purple)" /> Changer le mot de passe

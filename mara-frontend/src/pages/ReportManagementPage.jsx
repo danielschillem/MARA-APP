@@ -108,13 +108,22 @@ export default function ReportManagementPage() {
           <p style={{ color: 'var(--text-light)', fontSize: 14 }}>{meta.total || 0} signalements au total</p>
         </div>
         <a
-          href={`${import.meta.env.VITE_API_URL || 'http://localhost:8081/api'}/reports/export${filters.status ? `?status=${filters.status}` : ''}${filters.priority ? `&priority=${filters.priority}` : ''}`}
+          href={`${import.meta.env.VITE_API_URL || ''}/api/reports/export${filters.status ? `?status=${filters.status}` : ''}${filters.priority ? `&priority=${filters.priority}` : ''}`}
           target="_blank"
           rel="noopener noreferrer"
           className="btn btn-outline"
           style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13 }}
         >
           <Download size={14} /> Exporter CSV
+        </a>
+        <a
+          href={`${import.meta.env.VITE_API_URL || ''}/api/reports/export?format=pdf${filters.status ? `&status=${filters.status}` : ''}${filters.priority ? `&priority=${filters.priority}` : ''}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="btn btn-primary"
+          style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13 }}
+        >
+          <Download size={14} /> Exporter PDF
         </a>
       </div>
 

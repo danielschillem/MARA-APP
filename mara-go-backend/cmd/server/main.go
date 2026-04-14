@@ -77,6 +77,7 @@ func main() {
 		// ── Auth (rate limited) ───────────────────────────────────────────────────
 		r.With(authmw.RateLimit).Post("/register", authH.Register)
 		r.With(authmw.RateLimit).Post("/login", authH.Login)
+		r.Post("/refresh-token", authH.RefreshToken)
 
 		// ── Public data ──────────────────────────────────────────────────────────
 		r.Get("/violence-types", dirH.ViolenceTypes)

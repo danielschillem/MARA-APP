@@ -303,46 +303,100 @@ func (h *ReportHandler) Stats(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-// GET /reports/export â€” export reports as CSV (protected)
+// GET /reports/export - export reports as CSV or printable HTML (protected)
 func (h *ReportHandler) Export(w http.ResponseWriter, r *http.Request) {
-	var reports []models.Report
-	q := h.db.Preload("ViolenceTypes").Order("created_at DESC")
+var reports []models.Report
+q := h.db.Preload("ViolenceTypes").Order("created_at DESC")
 
-	if status := r.URL.Query().Get("status"); status != "" {
-		q = q.Where("status = ?", status)
-	}
-	if region := r.URL.Query().Get("region"); region != "" {
-		q = q.Where("region = ?", region)
-	}
-	q.Limit(5000).Find(&reports)
+if status := r.URL.Query().Get("status"); status != "" {
+q = q.Where("status = ?", status)
+}
+if region := r.URL.Query().Get("region"); region != "" {
+q = q.Where("region = ?", region)
+}
+q.Limit(5000).Find(&reports)
 
-	w.Header().Set("Content-Type", "text/csv; charset=utf-8")
-	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=rapports-mara-%s.csv", time.Now().Format("2006-01-02")))
-
-	wr := csv.NewWriter(w)
-	defer wr.Flush()
-
-	wr.Write([]string{"RÃ©fÃ©rence", "Date", "Type signalant", "Genre victime", "RÃ©gion", "Zone", "Statut", "PrioritÃ©", "Canal", "En cours", "Description", "Types de violence"})
-
-	for _, rep := range reports {
-		slugs := make([]string, len(rep.ViolenceTypes))
-		for i, vt := range rep.ViolenceTypes {
-			slugs[i] = vt.LabelFr
-		}
-		wr.Write([]string{
-			rep.Reference,
-			rep.CreatedAt.Format("02/01/2006 15:04"),
-			string(rep.ReporterType),
-			rep.VictimGender,
-			rep.Region,
-			rep.Zone,
-			string(rep.Status),
-			string(rep.Priority),
-			rep.Channel,
-			fmt.Sprintf("%v", rep.IsOngoing),
-			rep.Description,
-			strings.Join(slugs, " | "),
-		})
-	}
+if r.URL.Query().Get("format") == "pdf" {
+h.exportHTML(w, reports)
+return
 }
 
+w.Header().Set("Content-Type", "text/csv; charset=utf-8")
+w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=rapports-mara-%s.csv", time.Now().Format("2006-01-02")))
+
+wr := csv.NewWriter(w)
+defer wr.Flush()
+
+wr.Write([]string{"Reference", "Date", "Type signalant", "Genre victime", "Region", "Zone", "Statut", "Priorite", "Canal", "En cours", "Description", "Types de violence"})
+
+for _, rep := range reports {
+slugs := make([]string, len(rep.ViolenceTypes))
+for i, vt := range rep.ViolenceTypes {
+slugs[i] = vt.LabelFr
+}
+wr.Write([]string{
+rep.Reference,
+rep.CreatedAt.Format("02/01/2006 15:04"),
+string(rep.ReporterType),
+rep.VictimGender,
+rep.Region,
+rep.Zone,
+string(rep.Status),
+string(rep.Priority),
+rep.Channel,
+fmt.Sprintf("%v", rep.IsOngoing),
+rep.Description,
+strings.Join(slugs, " | "),
+})
+}
+}
+
+func (h *ReportHandler) exportHTML(w http.ResponseWriter, reports []models.Report) {
+w.Header().Set("Content-Type", "text/html; charset=utf-8")
+statusClass := map[string]string{
+"new": "new", "assigned": "assigned", "inprogress": "inprogress",
+"resolved": "resolved", "closed": "closed",
+}
+htmlHeader := `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8">` +
+`<title>Rapports MARA</title><style>` +
+`body{font-family:Arial,sans-serif;font-size:12px;margin:24px;color:#1a1a1a}` +
+`h1{color:#B5103C;font-size:18px;margin-bottom:4px}p.meta{color:#666;margin-bottom:16px}` +
+`table{width:100%;border-collapse:collapse}` +
+`th{background:#B5103C;color:#fff;padding:8px 6px;text-align:left;font-size:11px}` +
+`td{padding:6px;border-bottom:1px solid #eee;vertical-align:top}` +
+`tr:nth-child(even){background:#fafafa}` +
+`.badge{display:inline-block;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:600}` +
+`.new{background:#ede9fe;color:#5b21b6}.assigned{background:#dbeafe;color:#1d4ed8}` +
+`.inprogress{background:#fef3c7;color:#92400e}.resolved{background:#d1fae5;color:#065f46}` +
+`.closed{background:#f3f4f6;color:#4b5563}` +
+`@media print{@page{size:A4 landscape;margin:12mm}body{margin:0}}` +
+`</style></head><body>` +
+`<h1>Rapport MARA - Violences</h1>`
+fmt.Fprintf(w, "%s<p class=\"meta\">Exporte le %s - %d signalements</p>"+
+"<table><thead><tr>"+
+"<th>Reference</th><th>Date</th><th>Type signalant</th><th>Genre victime</th>"+
+"<th>Region</th><th>Statut</th><th>Priorite</th><th>Types de violence</th><th>Description</th>"+
+"</tr></thead><tbody>",
+htmlHeader, time.Now().Format("02/01/2006 15:04"), len(reports))
+
+for _, rep := range reports {
+slugs := make([]string, len(rep.ViolenceTypes))
+for i, vt := range rep.ViolenceTypes {
+slugs[i] = vt.LabelFr
+}
+cls := statusClass[string(rep.Status)]
+desc := rep.Description
+if len(desc) > 120 {
+desc = desc[:120] + "..."
+}
+fmt.Fprintf(w,
+"<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td>"+
+"<td><span class=\"badge %s\">%s</span></td><td>%s</td><td>%s</td><td>%s</td></tr>",
+rep.Reference, rep.CreatedAt.Format("02/01/2006 15:04"),
+string(rep.ReporterType), rep.VictimGender, rep.Region,
+cls, string(rep.Status), string(rep.Priority),
+strings.Join(slugs, ", "), desc,
+)
+}
+fmt.Fprintf(w, "</tbody></table><script>window.print()</script></body></html>")
+}

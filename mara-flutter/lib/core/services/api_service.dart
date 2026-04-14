@@ -40,6 +40,26 @@ class ApiService {
     return res.data;
   }
 
+  Future<Map<String, dynamic>> register({
+    required String name,
+    required String email,
+    required String password,
+  }) async {
+    final res = await _dio.post('/register', data: {
+      'name': name,
+      'email': email,
+      'password': password,
+      'role': 'conseiller',
+    });
+    return res.data;
+  }
+
+  Future<Map<String, dynamic>> refreshToken(String refreshToken) async {
+    final res = await _dio
+        .post('/refresh-token', data: {'refresh_token': refreshToken});
+    return res.data;
+  }
+
   // ── Alerts (VeilleProtect) ────────────────────────────────────────────────
   Future<Map<String, dynamic>> createAlert(Map<String, dynamic> alert) async {
     final res = await _dio.post('/alerts', data: alert);
@@ -54,6 +74,23 @@ class ApiService {
   // ── Reports ───────────────────────────────────────────────────────────────
   Future<Map<String, dynamic>> createReport(Map<String, dynamic> report) async {
     final res = await _dio.post('/reports', data: report);
+    return res.data;
+  }
+
+  Future<Map<String, dynamic>> createReportWithMedia(
+    Map<String, dynamic> fields, {
+    String? imagePath,
+    String? audioPath,
+  }) async {
+    final formData = FormData.fromMap({
+      ...fields,
+      if (imagePath != null)
+        'photo': await MultipartFile.fromFile(imagePath, filename: 'photo.jpg'),
+      if (audioPath != null)
+        'voice_note': await MultipartFile.fromFile(audioPath,
+            filename: 'voice_note.webm'),
+    });
+    final res = await _dio.post('/reports', data: formData);
     return res.data;
   }
 

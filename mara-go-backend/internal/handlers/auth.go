@@ -57,8 +57,9 @@ func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 	}
 
 	token, _ := middleware.GenerateToken(&user, h.secret)
+	refresh, _ := middleware.GenerateRefreshToken(&user, h.secret)
 	w.WriteHeader(http.StatusCreated)
-	jsonOK(w, map[string]interface{}{"user": user, "token": token})
+	jsonOK(w, map[string]interface{}{"user": user, "token": token, "refresh_token": refresh})
 }
 
 func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
@@ -83,7 +84,31 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	token, _ := middleware.GenerateToken(&user, h.secret)
-	jsonOK(w, map[string]interface{}{"user": user, "token": token})
+	refresh, _ := middleware.GenerateRefreshToken(&user, h.secret)
+	jsonOK(w, map[string]interface{}{"user": user, "token": token, "refresh_token": refresh})
+}
+
+func (h *AuthHandler) RefreshToken(w http.ResponseWriter, r *http.Request) {
+	var req struct {
+		RefreshToken string `json:"refresh_token"`
+	}
+	if err := decode(r, &req); err != nil || req.RefreshToken == "" {
+		jsonError(w, "refresh_token required", http.StatusBadRequest)
+		return
+	}
+	claims, err := middleware.ParseToken(req.RefreshToken, h.secret)
+	if err != nil || claims.TokenType != "refresh" {
+		jsonError(w, "invalid or expired refresh token", http.StatusUnauthorized)
+		return
+	}
+	var user models.User
+	if err := h.db.First(&user, claims.UserID).Error; err != nil {
+		jsonError(w, "user not found", http.StatusUnauthorized)
+		return
+	}
+	newToken, _ := middleware.GenerateToken(&user, h.secret)
+	newRefresh, _ := middleware.GenerateRefreshToken(&user, h.secret)
+	jsonOK(w, map[string]interface{}{"token": newToken, "refresh_token": newRefresh})
 }
 
 func (h *AuthHandler) Logout(w http.ResponseWriter, r *http.Request) {

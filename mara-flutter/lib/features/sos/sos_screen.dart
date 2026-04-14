@@ -573,10 +573,13 @@ class _SosScreenState extends State<SosScreen> with TickerProviderStateMixin {
           children: [
             Icon(Icons.lock_rounded, size: 11, color: AppColors.muted),
             SizedBox(width: 6),
-            Text(
-              'Chiffré de bout en bout  ·  Anonymat garanti',
-              style: TextStyle(
-                  fontSize: 10, color: AppColors.muted, letterSpacing: 0.1),
+            Flexible(
+              child: Text(
+                'Chiffré de bout en bout  ·  Anonymat garanti',
+                style: TextStyle(
+                    fontSize: 10, color: AppColors.muted, letterSpacing: 0.1),
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
           ],
         ),

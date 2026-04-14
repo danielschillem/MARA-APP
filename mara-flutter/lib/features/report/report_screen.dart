@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:mara_flutter/core/services/api_service.dart';
 import 'package:mara_flutter/core/theme/app_theme.dart';
 import 'package:mara_flutter/shared/models/alert_model.dart';
@@ -19,6 +21,9 @@ class _ReportScreenState extends State<ReportScreen> {
   bool _isOngoing = false;
   bool _hasPhoto = false;
   bool _hasAudio = false;
+  String? _imagePath;
+  double? _lat;
+  double? _lng;
   final _descCtrl = TextEditingController();
   bool _loading = false;
   String? _reference;
@@ -41,11 +46,42 @@ class _ReportScreenState extends State<ReportScreen> {
         if (_step > 0) _step--;
       });
 
+  Future<void> _pickImage() async {
+    final picker = ImagePicker();
+    final picked =
+        await picker.pickImage(source: ImageSource.gallery, imageQuality: 70);
+    if (picked != null)
+      setState(() {
+        _imagePath = picked.path;
+        _hasPhoto = true;
+      });
+  }
+
+  Future<void> _getLocation() async {
+    try {
+      LocationPermission perm = await Geolocator.checkPermission();
+      if (perm == LocationPermission.denied) {
+        perm = await Geolocator.requestPermission();
+      }
+      if (perm == LocationPermission.deniedForever) return;
+      final pos = await Geolocator.getCurrentPosition(
+          locationSettings:
+              const LocationSettings(accuracy: LocationAccuracy.medium));
+      setState(() {
+        _lat = pos.latitude;
+        _lng = pos.longitude;
+      });
+    } catch (_) {/* optional — user can skip */}
+  }
+
   Future<void> _submit() async {
     setState(() => _loading = true);
     try {
+      // Get location if not yet obtained
+      if (_lat == null) await _getLocation();
+
       final api = ApiService();
-      final res = await api.createAlert({
+      final fields = {
         'type_id': _selectedType ?? 'physical',
         'victim_type': _selectedVictim ?? 'unknown',
         'is_ongoing': _isOngoing,
@@ -54,9 +90,18 @@ class _ReportScreenState extends State<ReportScreen> {
         'has_photo': _hasPhoto,
         'has_audio': _hasAudio,
         'notes': _descCtrl.text,
-      });
+        if (_lat != null) 'lat': _lat,
+        if (_lng != null) 'lng': _lng,
+      };
+
+      Map<String, dynamic> res;
+      if (_imagePath != null) {
+        res = await api.createReportWithMedia(fields, imagePath: _imagePath);
+      } else {
+        res = await api.createAlert(fields);
+      }
       setState(() {
-        _reference = res['reference'];
+        _reference = res['reference'] ?? res['report']?['reference'];
         _step = 4;
       });
     } catch (e) {
@@ -309,10 +354,10 @@ class _ReportScreenState extends State<ReportScreen> {
             Expanded(
               child: _MediaBtn(
                 icon: Icons.camera_alt,
-                label: 'Photo / Vidéo',
+                label: _imagePath != null ? 'Photo ajoutée ✓' : 'Photo / Vidéo',
                 active: _hasPhoto,
                 activeColor: AppColors.navy,
-                onTap: () => setState(() => _hasPhoto = !_hasPhoto),
+                onTap: _pickImage,
               ),
             ),
             const SizedBox(width: 10),
@@ -326,6 +371,36 @@ class _ReportScreenState extends State<ReportScreen> {
               ),
             ),
           ],
+        ),
+        const SizedBox(height: 8),
+        // Géolocalisation
+        GestureDetector(
+          onTap: _getLocation,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            decoration: BoxDecoration(
+              color: _lat != null ? AppColors.greenLight : AppColors.surface,
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(
+                  color: _lat != null ? AppColors.green : AppColors.border),
+            ),
+            child: Row(children: [
+              Icon(Icons.location_on_rounded,
+                  size: 16,
+                  color: _lat != null ? AppColors.green : AppColors.muted),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  _lat != null
+                      ? 'Position : ${_lat!.toStringAsFixed(4)}, ${_lng!.toStringAsFixed(4)}'
+                      : 'Ajouter ma localisation (optionnel)',
+                  style: TextStyle(
+                      fontSize: 12,
+                      color: _lat != null ? AppColors.green : AppColors.sub),
+                ),
+              ),
+            ]),
+          ),
         ),
         const SizedBox(height: 16),
         const Text('DESCRIPTION',

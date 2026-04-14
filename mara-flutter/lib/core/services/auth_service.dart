@@ -40,14 +40,43 @@ class AuthService {
   Future<Map<String, dynamic>> login(String email, String password) async {
     final data = await _api.login(email, password);
     final jwt = data['token'] as String?;
+    final refreshTok = data['refresh_token'] as String?;
     final user = data['user'] as Map<String, dynamic>?;
     if (jwt == null) throw Exception('No token received');
     await _box.put(_tokenKey, jwt);
+    if (refreshTok != null) await _box.put('refresh_token', refreshTok);
     if (user != null) await _box.put(_userKey, jsonEncode(user));
     return data;
   }
 
+  Future<Map<String, dynamic>> register({
+    required String name,
+    required String email,
+    required String password,
+  }) async {
+    final data =
+        await _api.register(name: name, email: email, password: password);
+    final jwt = data['token'] as String?;
+    final refreshTok = data['refresh_token'] as String?;
+    final user = data['user'] as Map<String, dynamic>?;
+    if (jwt == null) throw Exception('No token received');
+    await _box.put(_tokenKey, jwt);
+    if (refreshTok != null) await _box.put('refresh_token', refreshTok);
+    if (user != null) await _box.put(_userKey, jsonEncode(user));
+    return data;
+  }
+
+  Future<void> refreshToken() async {
+    final refresh = _box.get('refresh_token') as String?;
+    if (refresh == null) throw Exception('No refresh token');
+    final data = await _api.refreshToken(refresh);
+    final jwt = data['token'] as String?;
+    final newRefresh = data['refresh_token'] as String?;
+    if (jwt != null) await _box.put(_tokenKey, jwt);
+    if (newRefresh != null) await _box.put('refresh_token', newRefresh);
+  }
+
   Future<void> logout() async {
-    await _box.deleteAll([_tokenKey, _userKey]);
+    await _box.deleteAll([_tokenKey, _userKey, 'refresh_token']);
   }
 }

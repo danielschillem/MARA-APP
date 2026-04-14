@@ -15,15 +15,31 @@ type contextKey string
 const UserKey contextKey = "user"
 
 type Claims struct {
-	UserID uint             `json:"user_id"`
-	Role   models.UserRole  `json:"role"`
+	UserID    uint            `json:"user_id"`
+	Role      models.UserRole `json:"role"`
+	TokenType string          `json:"token_type,omitempty"` // "access" | "refresh"
 	jwt.RegisteredClaims
 }
 
 func GenerateToken(user *models.User, secret string) (string, error) {
 	claims := Claims{
-		UserID: user.ID,
-		Role:   user.Role,
+		UserID:    user.ID,
+		Role:      user.Role,
+		TokenType: "access",
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),
+			IssuedAt:  jwt.NewNumericDate(time.Now()),
+		},
+	}
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	return token.SignedString([]byte(secret))
+}
+
+func GenerateRefreshToken(user *models.User, secret string) (string, error) {
+	claims := Claims{
+		UserID:    user.ID,
+		Role:      user.Role,
+		TokenType: "refresh",
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(30 * 24 * time.Hour)),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),

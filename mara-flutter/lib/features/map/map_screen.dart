@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:mara_flutter/core/services/api_service.dart';
 import 'package:mara_flutter/core/theme/app_theme.dart';
@@ -15,11 +16,29 @@ class _MapScreenState extends State<MapScreen> {
   List<dynamic> _alerts = [];
   String _filter = 'all';
   bool _loading = true;
+  final _mapController = MapController();
+  LatLng? _userPosition;
 
   @override
   void initState() {
     super.initState();
     _loadAlerts();
+    _centerOnUser();
+  }
+
+  Future<void> _centerOnUser() async {
+    try {
+      LocationPermission perm = await Geolocator.checkPermission();
+      if (perm == LocationPermission.denied) {
+        perm = await Geolocator.requestPermission();
+      }
+      if (perm == LocationPermission.deniedForever) return;
+      final pos = await Geolocator.getCurrentPosition(
+          locationSettings:
+              const LocationSettings(accuracy: LocationAccuracy.medium));
+      setState(() => _userPosition = LatLng(pos.latitude, pos.longitude));
+      _mapController.move(_userPosition!, 13.0);
+    } catch (_) {/* use default center */}
   }
 
   Future<void> _loadAlerts() async {
@@ -54,8 +73,9 @@ class _MapScreenState extends State<MapScreen> {
       body: Stack(
         children: [
           FlutterMap(
+            mapController: _mapController,
             options: MapOptions(
-              initialCenter: const LatLng(5.36, -4.00), // Abidjan
+              initialCenter: const LatLng(5.36, -4.00), // Abidjan default
               initialZoom: 11.5,
             ),
             children: [
@@ -63,6 +83,26 @@ class _MapScreenState extends State<MapScreen> {
                 urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
                 userAgentPackageName: 'bf.mara.flutter',
               ),
+              if (_userPosition != null)
+                MarkerLayer(markers: [
+                  Marker(
+                    point: _userPosition!,
+                    width: 20,
+                    height: 20,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: AppColors.primary,
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Colors.white, width: 3),
+                        boxShadow: [
+                          BoxShadow(
+                              color: AppColors.primary.withValues(alpha: 0.4),
+                              blurRadius: 10)
+                        ],
+                      ),
+                    ),
+                  ),
+                ]),
               if (!_loading)
                 MarkerLayer(
                   markers: _alerts

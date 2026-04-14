@@ -70,29 +70,29 @@ const (
 )
 
 type Report struct {
-	ID           uint           `json:"id" gorm:"primaryKey"`
-	Reference    string         `json:"reference" gorm:"not null"`
-	ReporterType ReporterType   `json:"reporter_type" gorm:"default:'anonymous'"`
-	VictimGender string         `json:"victim_gender"`
-	Region       string         `json:"region"`
-	Zone         string         `json:"zone"`
-	Lat          float64        `json:"lat"`
-	Lng          float64        `json:"lng"`
-	Description  string         `json:"description"`
-	Status       ReportStatus   `json:"status" gorm:"default:'new'"`
-	Priority     ReportPriority `json:"priority" gorm:"default:'medium'"`
-	IsOngoing    bool           `json:"is_ongoing" gorm:"default:false"`
-	Channel      string         `json:"channel" gorm:"default:'app'"`
-	HasPhoto     bool           `json:"has_photo" gorm:"default:false"`
-	HasAudio     bool           `json:"has_audio" gorm:"default:false"`
-	Notes        string         `json:"notes"`
-	AssignedTo   *uint          `json:"assigned_to"`
-	Coordinator  *User          `json:"coordinator,omitempty" gorm:"foreignKey:AssignedTo"`
-	ViolenceTypes []ViolenceType `json:"violence_types" gorm:"many2many:report_violence_types"`
-	Attachments  []ReportAttachment `json:"attachments,omitempty"`
-	CreatedAt    time.Time      `json:"created_at"`
-	UpdatedAt    time.Time      `json:"updated_at"`
-	DeletedAt    gorm.DeletedAt `json:"-" gorm:"index"`
+	ID            uint               `json:"id" gorm:"primaryKey"`
+	Reference     string             `json:"reference" gorm:"not null"`
+	ReporterType  ReporterType       `json:"reporter_type" gorm:"default:'anonymous'"`
+	VictimGender  string             `json:"victim_gender"`
+	Region        string             `json:"region"`
+	Zone          string             `json:"zone"`
+	Lat           float64            `json:"lat"`
+	Lng           float64            `json:"lng"`
+	Description   string             `json:"description"`
+	Status        ReportStatus       `json:"status" gorm:"default:'new'"`
+	Priority      ReportPriority     `json:"priority" gorm:"default:'medium'"`
+	IsOngoing     bool               `json:"is_ongoing" gorm:"default:false"`
+	Channel       string             `json:"channel" gorm:"default:'app'"`
+	HasPhoto      bool               `json:"has_photo" gorm:"default:false"`
+	HasAudio      bool               `json:"has_audio" gorm:"default:false"`
+	Notes         string             `json:"notes"`
+	AssignedTo    *uint              `json:"assigned_to"`
+	Coordinator   *User              `json:"coordinator,omitempty" gorm:"foreignKey:AssignedTo"`
+	ViolenceTypes []ViolenceType     `json:"violence_types" gorm:"many2many:report_violence_types"`
+	Attachments   []ReportAttachment `json:"attachments,omitempty"`
+	CreatedAt     time.Time          `json:"created_at"`
+	UpdatedAt     time.Time          `json:"updated_at"`
+	DeletedAt     gorm.DeletedAt     `json:"-" gorm:"index"`
 }
 
 type ReportAttachment struct {
@@ -168,13 +168,13 @@ type Resource struct {
 // ─── ServiceDirectory ─────────────────────────────────────────────────────────
 
 type ServiceDirectory struct {
-	ID          uint   `json:"id" gorm:"primaryKey"`
-	Name        string `json:"name" gorm:"not null"`
-	Type        string `json:"type"`
-	Region      string `json:"region"`
-	Phone       string `json:"phone"`
-	Address     string `json:"address"`
-	Description string `json:"description"`
+	ID          uint    `json:"id" gorm:"primaryKey"`
+	Name        string  `json:"name" gorm:"not null"`
+	Type        string  `json:"type"`
+	Region      string  `json:"region"`
+	Phone       string  `json:"phone"`
+	Address     string  `json:"address"`
+	Description string  `json:"description"`
 	Lat         float64 `json:"lat"`
 	Lng         float64 `json:"lng"`
 }

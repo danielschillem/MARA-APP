@@ -275,8 +275,11 @@ class _QueueItem extends StatelessWidget {
                 if (queuedAt.isNotEmpty) ...[
                   const SizedBox(height: 2),
                   Text(
-                    queuedAt.length >= 10 ? queuedAt.substring(0, 10) : queuedAt,
-                    style: const TextStyle(fontSize: 10, color: AppColors.placeholder),
+                    queuedAt.length >= 10
+                        ? queuedAt.substring(0, 10)
+                        : queuedAt,
+                    style: const TextStyle(
+                        fontSize: 10, color: AppColors.placeholder),
                   ),
                 ],
               ],
@@ -284,8 +287,7 @@ class _QueueItem extends StatelessWidget {
           ),
           // Badge
           Container(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
             decoration: BoxDecoration(
               color: AppColors.warningLight,
               borderRadius: BorderRadius.circular(20),

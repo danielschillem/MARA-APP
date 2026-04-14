@@ -1,6 +1,8 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { useCallback } from 'react';
 import { AuthProvider } from './contexts/AuthContext';
-import { ToastProvider } from './components/Toast';
+import { ToastProvider, useToast } from './components/Toast';
+import { useWsNotifications } from './hooks/useWsNotifications';
 import Layout from './components/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
 import HomePage from './pages/HomePage';
@@ -21,11 +23,32 @@ import AlertsPage from './pages/AlertsPage';
 import TeamPage from './pages/TeamPage';
 import AdminPage from './pages/AdminPage';
 
+// ─── Real-time WS notifications ───────────────────────────────────────────────
+const WS_MESSAGES = {
+  new_report: { text: 'Nouveau signalement reçu', type: 'info' },
+  report_updated: { text: 'Signalement mis à jour', type: 'success' },
+  new_alert: { text: 'Nouvelle alerte citoyenne', type: 'warning' },
+  alert_updated: { text: 'Alerte mise à jour', type: 'info' },
+  new_message: { text: 'Nouveau message reçu', type: 'info' },
+  conversation_closed: { text: 'Conversation clôturée', type: 'success' },
+};
+
+function WsNotifier() {
+  const { addToast } = useToast();
+  const handleEvent = useCallback((event) => {
+    const meta = WS_MESSAGES[event.type];
+    if (meta) addToast(meta.text, meta.type, 5000);
+  }, [addToast]);
+  useWsNotifications(handleEvent);
+  return null;
+}
+
 export default function App() {
   return (
     <AuthProvider>
       <ToastProvider>
         <BrowserRouter>
+          <WsNotifier />
           <Routes>
             <Route element={<Layout />}>
               {/* Public routes */}
